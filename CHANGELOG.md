@@ -1,4 +1,16 @@
-## [1.10.054] - 2026-09-25 00:00
+## [1.10.058] - 2026-09-28 00:00
+
+### Changed
+
+#### Menu lateral (rebranding Douno)
+
+- Menu lateral redesenhado com a nova identidade Douno: painel flutuante suspenso (cantos arredondados, afastado das bordas, sombra), fundo azul-marinho no lugar do preto/verde anterior, e cor de destaque em verde esmeralda.
+- Logo "DOUNO" (arte real da marca, em branco) substituindo o ícone e o texto "Taskin" antigos; "Tasks" como subtítulo do produto logo abaixo, mais próximo do logo.
+- Menu reduzido agora mostra o ícone "D" oficial da marca (traço, sem fundo colorido), maior e em branco.
+- Botão de expandir/recolher redesenhado como um círculo branco na borda direita do painel.
+- Mudança restrita ao menu lateral — nenhuma outra tela do sistema foi alterada.
+
+
 
 ### Changed
 
