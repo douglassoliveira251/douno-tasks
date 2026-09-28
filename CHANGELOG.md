@@ -1,4 +1,21 @@
-## [1.10.058] - 2026-09-28 00:00
+## [1.10.064] - 2026-09-28 00:00
+
+### Changed
+
+#### Menu lateral
+
+- Logo "DOUNO" e subtítulo "Tasks" mais próximos, com uma linha divisória separando esse bloco dos itens de navegação.
+- Botão de expandir/recolher menor e recolorido para combinar com o menu (fundo e borda escuros, ícone verde) em vez do círculo branco anterior.
+- Espaçamento adicionado entre o menu e o início do conteúdo da tela.
+- Logo da marca recortado (sem a folga transparente do arquivo original) para o espaçamento visual bater com o valor real definido em CSS.
+
+#### Tela de login
+
+- Redesenhada no formato split-screen (referência: tela de acesso do Anora) — painel de marca à esquerda em telas grandes (headline, texto de apoio, selo de segurança dos dados) e formulário centralizado à direita; em telas pequenas, só o formulário aparece, com o logo compacto no topo.
+- Campo de senha ganhou botão de mostrar/ocultar.
+- Logo e identidade visual do Taskin mantidos como estavam nessa tela (não usa a marca Douno).
+
+
 
 ### Changed
 
