@@ -1,4 +1,12 @@
-## [1.10.066] - 2026-09-28 00:00
+## [1.10.068] - 2026-09-28 00:00
+
+### Changed
+
+- "Tasks" (menu e login) com peso mais leve: a fonte Sora carregava só nos pesos 400/600/700/800, então `font-weight:500` caía pro 600 (parecia negrito); adicionado o peso 500 ao carregamento da fonte para renderizar como médio de verdade.
+- Login: "Tasks" agora centralizado sob o "DOUNO", em vez de alinhado à esquerda.
+- Favicon trocado para o ícone "D" oficial da marca Douno, fundo azul-escuro e traço branco (era o ícone antigo do Taskin).
+
+
 
 ### Changed
 
