@@ -178,9 +178,9 @@
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:0;
+    gap:4px;
   }
-  .sidebar-wordmark-img{height:34px; display:block; filter:brightness(0) invert(1);}
+  .sidebar-wordmark-img{height:26px; display:block; filter:brightness(0) invert(1);}
   .brand-wordmark{
     font-family:var(--font-display);
     font-weight:800;
@@ -1512,8 +1512,11 @@
   }
   .about-close-btn:hover{background:var(--surface-2); color:var(--ink);}
 
-  /* ---------- TELA DE LOGIN (split-screen) ---------- */
-  #loginOverlay.overlay{background:var(--surface); padding:0; align-items:stretch; justify-content:stretch;}
+  /* ---------- TELA DE LOGIN (split-screen, identidade Douno Tasks) ---------- */
+  #loginOverlay.overlay{
+    background:var(--surface); padding:0; align-items:stretch; justify-content:stretch;
+    --primary:#10B981; --primary-dark:#059669; --primary-light:#D1FAE5;
+  }
   #loginOverlay.overlay.show{display:block;}
   #loginModalBody{width:100%; height:100vh; display:grid; grid-template-columns:1fr;}
   @media (min-width:960px){
@@ -1521,12 +1524,13 @@
   }
   .login-aside{
     display:none; position:relative; flex-direction:column; justify-content:space-between;
-    overflow:hidden; padding:48px; background:#15171C; color:#fff;
+    overflow:hidden; padding:48px; background:#151B28; color:#fff;
   }
   @media (min-width:960px){ .login-aside{display:flex;} }
-  .login-aside-brand{display:flex; align-items:center; gap:10px;}
-  .login-aside-brand svg{width:30px; height:30px; flex-shrink:0;}
-  .login-aside-brand span{font-family:var(--font-display); font-weight:800; font-size:19px; color:#fff;}
+  .login-brand-lockup{display:flex; flex-direction:column; align-items:flex-start; gap:3px;}
+  .login-brand-lockup .login-wordmark-img{display:block;}
+  .login-brand-lockup .login-brand-sub{font-size:13px; font-weight:500; color:#10B981; line-height:1;}
+  .login-aside-brand .login-wordmark-img{height:26px; filter:brightness(0) invert(1);}
   .login-aside-pitch{max-width:380px; position:relative; z-index:1;}
   .login-aside-pitch h2{
     font-family:var(--font-display); font-weight:700; font-size:28px; line-height:1.25;
@@ -1540,10 +1544,9 @@
   }
   .login-main{display:flex; align-items:center; justify-content:center; padding:32px 20px; overflow-y:auto;}
   .login-main-inner{width:100%; max-width:380px;}
-  .login-mobile-brand{display:flex; align-items:center; gap:9px; margin-bottom:32px;}
+  .login-mobile-brand{margin-bottom:32px;}
   @media (min-width:960px){ .login-mobile-brand{display:none;} }
-  .login-mobile-brand svg{width:26px; height:26px;}
-  .login-mobile-brand span{font-family:var(--font-display); font-weight:800; font-size:18px; color:var(--primary);}
+  .login-mobile-brand .login-wordmark-img{height:22px;}
   .login-title{font-family:var(--font-display); font-weight:700; font-size:25px; color:var(--ink); margin:0;}
   .login-subtitle{font-size:14px; color:var(--ink-soft); margin:6px 0 0;}
   .login-form{margin-top:26px; display:flex; flex-direction:column;}
@@ -4768,7 +4771,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.064';
+const APP_VERSION = '1.10.066';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -6807,33 +6810,28 @@ async function startCloudSession(){
   updateFileStatus();
 }
 
-function taskinLogoSvg(){
-  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <rect x="10" y="12" width="14" height="76" rx="7" fill="#3FA087"/>
-    <rect x="10" y="12" width="70" height="14" rx="7" fill="#3FA087"/>
-    <rect x="29" y="37" width="53" height="10" rx="5" fill="#3FA087"/>
-    <rect x="29" y="56" width="34" height="10" rx="5" fill="#3FA087"/>
-    <path d="M42 76l10 10 28 -28" stroke="#3FA087" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </svg>`;
+function dounoIconSvg(color){
+  return `<svg viewBox="0 0 512 512" fill="none"><path d="M112 152H292 C364 152 408 192 408 256 C408 320 364 360 292 360 H112 V300" stroke="${color}" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
+const DOUNO_WORDMARK_SRC = document.querySelector('.sidebar-wordmark-img').getAttribute('src');
 
 function renderLoginGate(errorMsg){
   const body = document.getElementById('loginModalBody');
   body.innerHTML = `
     <aside class="login-aside">
-      <div class="login-aside-brand">${taskinLogoSvg()}<span>Taskin</span></div>
+      <div class="login-aside-brand login-brand-lockup"><img class="login-wordmark-img" src="${DOUNO_WORDMARK_SRC}" alt="Douno"><span class="login-brand-sub">Tasks</span></div>
       <div class="login-aside-pitch">
         <h2>Organize tarefas, notas e calendário no seu ritmo.</h2>
         <p>Tudo num só lugar, com indicadores claros do que importa — e sincronizado com segurança entre seus dispositivos.</p>
       </div>
       <div class="login-aside-foot">Seus dados protegidos e sincronizados na nuvem.</div>
-      <div class="login-aside-watermark">${taskinLogoSvg()}</div>
+      <div class="login-aside-watermark">${dounoIconSvg('#ffffff')}</div>
     </aside>
     <div class="login-main">
       <div class="login-main-inner">
-        <div class="login-mobile-brand">${taskinLogoSvg()}<span>Taskin</span></div>
+        <div class="login-mobile-brand login-brand-lockup"><img class="login-wordmark-img" src="${DOUNO_WORDMARK_SRC}" alt="Douno"><span class="login-brand-sub">Tasks</span></div>
         <h1 class="login-title">Entrar</h1>
-        <p class="login-subtitle">Acesse sua conta do Taskin.</p>
+        <p class="login-subtitle">Acesse sua conta do Douno Tasks.</p>
         <form id="loginForm" class="login-form" novalidate>
           <div class="login-field">
             <label for="loginEmail">E-mail</label>

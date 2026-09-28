@@ -1,4 +1,16 @@
-## [1.10.064] - 2026-09-28 00:00
+## [1.10.066] - 2026-09-28 00:00
+
+### Changed
+
+#### Tela de login
+
+- Agora usa a identidade Douno Tasks (antes mantinha o logo/marca antiga do Taskin): logo "DOUNO" + "Tasks" no painel escuro, ícone oficial da marca como marca d'água, botão e realces em verde esmeralda, texto "Acesse sua conta do Douno Tasks.".
+
+#### Menu lateral
+
+- Logo "DOUNO" reduzido no modo expandido, com um pequeno espaço de volta entre ele e "Tasks" (tinha ficado colado demais no ajuste anterior).
+
+
 
 ### Changed
 
