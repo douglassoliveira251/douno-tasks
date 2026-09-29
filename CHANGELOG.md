@@ -1,3 +1,18 @@
+## [1.10.076] - 2026-09-29 00:00
+
+### Fixed
+
+#### Visão geral
+
+- O conteúdo do dashboard (`.dash-wrap`) tinha `max-width:1180px` fixo e centralizado, enquanto o card de título usa a largura toda disponível — em telas largas isso deixava o conteúdo mais estreito que o título, desalinhado. Removido o `max-width`, agora acompanha a mesma largura do card de título.
+
+#### Notas
+
+- Barrinha de rolagem horizontal indesejada no painel "Cadernos": `overflow-y:auto` sozinho faz o navegador tratar o eixo horizontal como `auto` também, e uma sobra de ~3px de conteúdo disparava a barra. Fixado `overflow-x:hidden` explícito.
+- Rolagem da nota não funcionava quando o conteúdo era mais alto que a tela: a correção de altura da rodada anterior dependia de `#notesView` virar `display:flex`, mas esse elemento já tem o `display` controlado por JS a cada render (`style.display = 'block'/'none'` para trocar de tela) — um estilo inline sempre vence a regra do CSS, então o `display:flex` nunca chegava a valer. Trocado para `height:100%` nos painéis internos, que não depende do pai ser flex.
+
+
+
 ## [1.10.075] - 2026-09-29 00:00
 
 ### Changed

@@ -985,12 +985,12 @@
     padding:0;
   }
 
-  #notesView{overflow:hidden !important; display:flex; flex-direction:column;}
-  .notes-layout{display:flex; gap:14px; align-items:stretch; flex:1; min-height:0;}
+  #notesView{overflow:hidden !important;}
+  .notes-layout{display:flex; gap:14px; align-items:stretch; height:100%;}
   .notebooks-col{
     width:260px; flex-shrink:0; display:flex; flex-direction:column; position:relative;
     background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm);
-    padding:16px 12px 16px 8px; height:100%; overflow-y:auto; box-sizing:border-box;
+    padding:16px 12px 16px 8px; height:100%; overflow-y:auto; overflow-x:hidden; box-sizing:border-box;
   }
   .notebooks-col-resize-handle{
     position:absolute; top:0; right:-3px; bottom:0; width:6px; cursor:col-resize; z-index:5;
@@ -1227,7 +1227,7 @@
   .cat-tags-combined-row{display:flex; align-items:center; gap:10px;}
   .cat-tags-combined-row .tp-tags-selected{flex:1; min-width:0;}
   /* ===== Dashboard ===== */
-  .dash-wrap{display:flex; flex-direction:column; gap:20px; max-width:1180px; margin:0 auto; padding-bottom:30px;}
+  .dash-wrap{display:flex; flex-direction:column; gap:20px; padding-bottom:30px;}
 
   .dash-header-row{display:flex; align-items:flex-start; justify-content:flex-end; flex-wrap:wrap; gap:12px;}
   .dash-main-title{font-family:var(--font-display); font-weight:600; font-size:24px; margin-bottom:2px;}
@@ -4890,7 +4890,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.075';
+const APP_VERSION = '1.10.076';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
