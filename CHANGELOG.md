@@ -1,3 +1,13 @@
+## [1.10.074] - 2026-09-29 00:00
+
+### Fixed
+
+#### Layout
+
+- Removido um recuo extra de 16px entre o menu lateral e o conteúdo das telas (o conteúdo agora começa logo depois do menu).
+
+
+
 ## [1.10.073] - 2026-09-29 00:00
 
 ### Fixed
