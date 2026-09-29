@@ -1,3 +1,13 @@
+## [1.10.078] - 2026-09-29 00:00
+
+### Changed
+
+#### Notas
+
+- Aumentada a altura dos cards de Cadernos e da nota: a tela reservava 60px de respiro embaixo (herdado do padrão das outras telas, que rolam), mas como o painel de Notas tem altura fixa esse espaço só sobrava vazio. Reduzido para 16px.
+
+
+
 ## [1.10.077] - 2026-09-29 00:00
 
 ### Changed
