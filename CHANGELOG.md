@@ -1,3 +1,13 @@
+## [1.10.080] - 2026-09-29 00:00
+
+### Changed
+
+#### Configurações
+
+- Aplicado o padrão visual das outras telas: o conteúdo de cada aba (Perfil, Personalização, Espaços, Tags, Arquivo) agora fica dentro de um card com sombra, em vez de flutuar direto no fundo da página. O toggle de "Modo escuro" virou uma linha com fundo levemente destacado em vez de uma caixa com borda própria dentro do card.
+
+
+
 ## [1.10.079] - 2026-09-29 00:00
 
 ### Added
