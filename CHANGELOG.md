@@ -1,3 +1,20 @@
+## [1.10.072] - 2026-09-28 00:00
+
+### Added
+
+#### Topo das telas
+
+- Botão de ajuda (?) na barra superior, ao lado das notificações: abre um painel flutuante com perguntas e respostas específicas da tela atual (Visão geral, Tarefas, Notas, Calendário, Configurações), com a versão do app no rodapé.
+
+### Changed
+
+#### Topo das telas
+
+- Barra superior reformulada seguindo o novo padrão: sem caixa/borda, mesmo fundo da página, com a busca à esquerda e ajuda/notificações/perfil (agora com o nome, não só o avatar) à direita.
+- Título da tela, subtítulo e o seletor de espaço saíram da barra superior e passaram a ficar num card próprio, no topo do conteúdo de cada tela.
+
+
+
 ## [1.10.071] - 2026-09-28 00:00
 
 ### Removed

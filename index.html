@@ -344,9 +344,59 @@
   .main{display:flex; flex-direction:column; height:100vh; overflow:hidden; margin-left:16px;}
   .topbar{
     display:flex; align-items:center; gap:14px;
-    padding:18px 28px; border-bottom:1px solid var(--border);
-    background:var(--surface);
+    padding:20px 28px 8px;
+    background:var(--bg);
   }
+  .page-header-card{
+    display:flex; align-items:center; gap:14px;
+    margin:8px 28px 4px;
+    padding:16px 20px;
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+  }
+  .topbar-profile-chip{
+    display:flex; align-items:center; gap:8px;
+    border:none; background:transparent; padding:3px 8px 3px 3px; border-radius:999px;
+    flex-shrink:0;
+  }
+  .topbar-profile-chip:hover{background:var(--surface-2);}
+  .topbar-profile-chip .profile-avatar{width:30px; height:30px;}
+  .topbar-profile-name{
+    font-size:13px; font-weight:600; color:var(--ink);
+    max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .topbar-profile-chevron{width:13px; height:13px; color:var(--ink-faint); flex-shrink:0;}
+  .help-panel{
+    position:fixed; top:16px; right:16px; bottom:16px; width:360px; z-index:65;
+    background:var(--surface); border:1px solid var(--border); border-radius:20px;
+    box-shadow:var(--shadow-lg); padding:22px 22px 18px;
+    display:flex; flex-direction:column;
+    transform:translateX(calc(100% + 24px)); transition:transform .18s;
+  }
+  .help-panel.show{transform:translateX(0);}
+  .help-panel-header{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .help-panel-header h3{font-family:var(--font-display); font-weight:700; font-size:16px;}
+  .help-panel-body{flex:1; overflow-y:auto; margin:10px 0;}
+  .help-item{border-bottom:1px solid var(--border);}
+  .help-item:last-child{border-bottom:none;}
+  .help-item-q{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    width:100%; text-align:left; border:none; background:transparent;
+    padding:13px 2px; font-size:13.5px; font-weight:600; color:var(--ink);
+  }
+  .help-item-q svg{width:15px; height:15px; color:var(--ink-faint); flex-shrink:0; transition:transform .15s;}
+  .help-item.open .help-item-q svg{transform:rotate(180deg);}
+  .help-item-a{
+    display:none; font-size:13px; color:var(--ink-soft); line-height:1.55; padding:0 2px 14px;
+  }
+  .help-item.open .help-item-a{display:block;}
+  .help-panel-footer{
+    padding-top:12px; border-top:1px solid var(--border);
+    font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono);
+  }
+  .help-panel-backdrop{
+    display:none; position:fixed; inset:0; z-index:64; background:rgba(15,23,42,.08);
+  }
+  .help-panel-backdrop.show{display:block;}
   .space-selector-wrap{position:relative; margin-right:4px;}
   .space-selector-btn{
     display:flex; align-items:center; gap:8px; border:1px solid var(--border); background:var(--surface);
@@ -427,6 +477,7 @@
     transition:right .15s;
   }
   .icon-add-btn.fab.shifted{ right:calc(var(--edit-panel-width, 500px) + 32px); }
+  .icon-add-btn.fab.help-open{ right:calc(360px + 32px); }
   .icon-add-btn.fab svg{width:22px; height:22px;}
   .icon-add-btn.fab:active{transform:scale(.94);}
   .search-wrap svg{position:absolute; left:10px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink-faint);}
@@ -1698,30 +1749,23 @@
   <!-- MAIN -->
   <main class="main">
     <div class="topbar">
-      <div class="space-selector-wrap" id="spaceSelectorWrap" style="display:none;">
-        <button class="space-selector-btn" id="spaceSelectorBtn">
-          <span class="space-selector-dot" id="spaceSelectorDot"></span>
-          <span class="space-selector-name" id="spaceSelectorName">Todos os espaços</span>
-          <svg class="space-selector-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="space-selector-dropdown" id="spaceSelectorDropdown" style="display:none;"></div>
-      </div>
-      <div class="view-title-wrap">
-        <div class="view-title" id="viewTitle">Tarefas</div>
-        <div class="view-subtitle" id="viewSubtitle" style="display:none;"></div>
+      <div class="search-wrap" id="searchWrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" placeholder="Buscar...">
+        <button type="button" class="search-clear-btn" id="searchClearBtn" title="Limpar busca" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
       <div class="topbar-right-group">
-        <div class="search-wrap" id="searchWrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input type="text" id="searchInput" placeholder="Buscar...">
-          <button type="button" class="search-clear-btn" id="searchClearBtn" title="Limpar busca" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-        </div>
+        <button class="notification-btn" id="helpBtn" title="Ajuda">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4"/><path d="M12 17h.01"/></svg>
+        </button>
         <button class="notification-btn" id="notificationBtn" title="Notificações">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
         </button>
         <div class="topbar-avatar-wrap" id="topbarAvatarWrap">
-          <button class="topbar-avatar-btn" id="topbarAvatarBtn" title="Conta">
+          <button class="topbar-profile-chip" id="topbarAvatarBtn" title="Conta">
             <span class="profile-avatar" id="profileAvatarTopbar"></span>
+            <span class="topbar-profile-name" id="topbarProfileName">Conta</span>
+            <svg class="topbar-profile-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="avatar-dropdown-menu" id="avatarDropdownMenu" style="display:none;">
             <div class="avatar-dropdown-header">
@@ -1747,6 +1791,31 @@
         </div>
       </div>
     </div>
+
+    <div class="page-header-card">
+      <div class="space-selector-wrap" id="spaceSelectorWrap" style="display:none;">
+        <button class="space-selector-btn" id="spaceSelectorBtn">
+          <span class="space-selector-dot" id="spaceSelectorDot"></span>
+          <span class="space-selector-name" id="spaceSelectorName">Todos os espaços</span>
+          <svg class="space-selector-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="space-selector-dropdown" id="spaceSelectorDropdown" style="display:none;"></div>
+      </div>
+      <div class="view-title-wrap">
+        <div class="view-title" id="viewTitle">Tarefas</div>
+        <div class="view-subtitle" id="viewSubtitle" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div class="help-panel" id="helpPanel">
+      <div class="help-panel-header">
+        <h3>Ajuda</h3>
+        <button type="button" class="tp-close" id="helpCloseBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="help-panel-body" id="helpPanelBody"></div>
+      <div class="help-panel-footer">Versão <span id="helpPanelVersion"></span></div>
+    </div>
+    <div class="help-panel-backdrop" id="helpPanelBackdrop"></div>
 
     <div class="view" id="dashboardView"></div>
     <div class="view" id="tasksView" style="display:none;"></div>
@@ -1904,6 +1973,59 @@ document.getElementById('aboutOverlay').addEventListener('click', e => {
 });
 
 document.getElementById('toggleThemeBtn').onclick = toggleTheme;
+
+const HELP_CONTENT = {
+  dashboard: [
+    { q: 'O que esse painel mostra?', a: 'Um resumo do que está em aberto: tarefas pendentes, notas recentes, eventos do dia e indicadores gerais de conclusão.' },
+    { q: 'Os números somem quando eu concluo uma tarefa?', a: 'Sim — os cards contam só o que está em aberto. Tarefas concluídas continuam no histórico, só saem da contagem.' },
+  ],
+  tasks: [
+    { q: 'Como crio uma tarefa recorrente?', a: 'Ao criar ou editar uma tarefa, abra o campo Recorrência e escolha a frequência. Dá pra definir uma data final pra repetição parar.' },
+    { q: 'Como agrupo as tarefas por outro critério?', a: 'Use o seletor "Agrupar por" no topo da lista pra trocar entre período, prioridade, tag ou espaço.' },
+    { q: 'Para onde vão as tarefas concluídas?', a: 'Ficam ocultas por padrão. Ative "Mostrar concluídas" no canto superior direito da lista pra vê-las.' },
+  ],
+  notes: [
+    { q: 'Posso organizar notas em cadernos?', a: 'Sim, cada espaço tem seus próprios cadernos. Crie um novo caderno pela lista de notas pra agrupar por assunto.' },
+    { q: 'As notas têm formatação?', a: 'Sim, o editor aceita negrito, listas, títulos e outros elementos básicos de texto rico.' },
+  ],
+  calendar: [
+    { q: 'Vincular uma agenda a uma tarefa muda a data da agenda?', a: 'Não quando a agenda já existia antes: a data que você definiu no calendário é mantida. Só quando a agenda nasce a partir de uma tarefa (pelo botão "criar agenda" nas tarefas) é que a data vem da tarefa.' },
+    { q: 'Como duplico uma agenda para outro dia?', a: 'Abra a agenda existente e use o botão "Duplicar" — ele cria uma cópia na mesma data, já pronta pra você trocar a data no formulário.' },
+  ],
+  settings: [
+    { q: 'Onde ficam meus dados?', a: 'Modo local: só no seu dispositivo, num arquivo que você escolhe. Modo nuvem: sincronizados com sua conta, acessíveis de qualquer aparelho logado.' },
+  ],
+};
+function renderHelpPanelContent(){
+  const items = HELP_CONTENT[currentView] || HELP_CONTENT.dashboard;
+  document.getElementById('helpPanelBody').innerHTML = items.map((item, i) => `
+    <div class="help-item${i === 0 ? ' open' : ''}">
+      <button type="button" class="help-item-q">
+        ${escapeHtml(item.q)}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="help-item-a">${escapeHtml(item.a)}</div>
+    </div>
+  `).join('');
+  document.getElementById('helpPanelBody').querySelectorAll('.help-item-q').forEach(btn => {
+    btn.onclick = () => btn.closest('.help-item').classList.toggle('open');
+  });
+}
+function openHelpPanel(){
+  document.getElementById('helpPanelVersion').textContent = APP_VERSION;
+  renderHelpPanelContent();
+  document.getElementById('helpPanel').classList.add('show');
+  document.getElementById('helpPanelBackdrop').classList.add('show');
+  document.getElementById('primaryAddBtn').classList.add('help-open');
+}
+function closeHelpPanel(){
+  document.getElementById('helpPanel').classList.remove('show');
+  document.getElementById('helpPanelBackdrop').classList.remove('show');
+  document.getElementById('primaryAddBtn').classList.remove('help-open');
+}
+document.getElementById('helpBtn').onclick = openHelpPanel;
+document.getElementById('helpCloseBtn').onclick = closeHelpPanel;
+document.getElementById('helpPanelBackdrop').onclick = closeHelpPanel;
 
 function normalizeState(){
   if(!state.profile) state.profile = { name:'', email:'', avatar:null };
@@ -3388,6 +3510,10 @@ document.addEventListener('keydown', (e) => {
   }
   if(document.getElementById('aboutOverlay').classList.contains('show')){
     closeAboutModal();
+    return;
+  }
+  if(document.getElementById('helpPanel').classList.contains('show')){
+    closeHelpPanel();
   }
 });
 
@@ -4737,7 +4863,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.071';
+const APP_VERSION = '1.10.072';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -6220,6 +6346,8 @@ function renderProfileCard(){
   const emailEl = document.getElementById('profileEmailDropdown');
   if(nameEl) nameEl.textContent = state.profile.name || 'Seu nome';
   if(emailEl) emailEl.textContent = state.profile.email || 'seu@email.com';
+  const chipNameEl = document.getElementById('topbarProfileName');
+  if(chipNameEl) chipNameEl.textContent = state.profile.name || 'Conta';
 }
 
 let tempAvatarData = null;
@@ -7200,6 +7328,7 @@ function render(){
   }
   addBtn.classList.toggle('shifted', currentView === 'tasks' && (activeTaskId || creatingNewTask));
   renderProfileCard();
+  if(document.getElementById('helpPanel').classList.contains('show')) renderHelpPanelContent();
   renderSidebarCats();
   if(currentView === 'dashboard') renderDashboard();
   else if(currentView === 'tasks') renderTasks();
