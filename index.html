@@ -470,6 +470,32 @@
   .search-clear-btn:hover{background:var(--surface-2); color:var(--ink);}
   .search-clear-btn svg{position:static; width:12px; height:12px; transform:none;}
 
+  .search-results-dropdown{
+    position:absolute; top:calc(100% + 8px); left:0; right:0; z-index:60;
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    box-shadow:var(--shadow-md); padding:8px; max-height:70vh; overflow-y:auto;
+  }
+  .search-results-group-label{
+    font-size:10.5px; font-weight:700; color:var(--ink-faint); letter-spacing:.04em;
+    text-transform:uppercase; padding:8px 10px 4px;
+  }
+  .search-results-group-label:first-child{padding-top:4px;}
+  .search-result-row{
+    display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; cursor:pointer;
+  }
+  .search-result-row:hover{background:var(--surface-2);}
+  .search-result-icon{
+    width:28px; height:28px; border-radius:8px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .search-result-icon svg{width:14px; height:14px;}
+  .search-result-title{
+    flex:1; min-width:0; font-size:13px; font-weight:500; color:var(--ink);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .search-result-meta{font-size:11px; color:var(--ink-faint); flex-shrink:0; white-space:nowrap;}
+  .search-results-empty{padding:18px 10px; text-align:center; font-size:12.5px; color:var(--ink-faint);}
+
   .file-bar{
     display:flex; align-items:center; gap:6px; margin-left:auto; flex-shrink:0;
   }
@@ -1795,8 +1821,9 @@
       </button>
       <div class="search-wrap" id="searchWrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="text" id="searchInput" placeholder="Buscar...">
+        <input type="text" id="searchInput" placeholder="Buscar tarefas, notas, eventos...">
         <button type="button" class="search-clear-btn" id="searchClearBtn" title="Limpar busca" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        <div class="search-results-dropdown" id="searchResultsDropdown" style="display:none;"></div>
       </div>
       <div class="topbar-right-group">
         <button class="notification-btn" id="helpBtn" title="Ajuda">
@@ -3608,6 +3635,10 @@ document.addEventListener('keydown', (e) => {
   }
   if(document.querySelector('.sidebar').classList.contains('mobile-open')){
     closeMobileSidebar();
+    return;
+  }
+  if(document.getElementById('searchResultsDropdown').style.display !== 'none'){
+    closeSearchResultsDropdown();
   }
 });
 
@@ -4957,7 +4988,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.080';
+const APP_VERSION = '1.10.081';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -7236,19 +7267,97 @@ function clearSearchTerm(){
   if(input) input.value = '';
   updateSearchClearBtnVisibility();
 }
+function computeGlobalSearchResults(term){
+  const t = term.trim().toLowerCase();
+  if(!t) return { tasks:[], notes:[], events:[] };
+  const tasks = state.tasks.filter(x => (x.title||'').toLowerCase().includes(t)).slice(0,5);
+  const notes = state.notes.filter(x => !x.archived && ((x.title||'')+' '+stripHtml(x.body||'')).toLowerCase().includes(t)).slice(0,5);
+  const events = state.events.filter(x => (x.title||'').toLowerCase().includes(t)).slice(0,5);
+  return { tasks, notes, events };
+}
+function closeSearchResultsDropdown(){
+  document.getElementById('searchResultsDropdown').style.display = 'none';
+}
+function renderSearchResultsDropdown(){
+  const dd = document.getElementById('searchResultsDropdown');
+  if(!searchTerm.trim()){ dd.style.display = 'none'; return; }
+  const { tasks, notes, events } = computeGlobalSearchResults(searchTerm);
+  if(!tasks.length && !notes.length && !events.length){
+    dd.innerHTML = `<div class="search-results-empty">Nenhum resultado para "${escapeHtml(searchTerm)}"</div>`;
+    dd.style.display = 'block';
+    return;
+  }
+  function group(label, items, iconKey, iconBg, iconColor, metaFn){
+    if(!items.length) return '';
+    return `
+      <div class="search-results-group-label">${label}</div>
+      ${items.map(it => `
+        <div class="search-result-row" data-kind="${iconKey}" data-id="${it.id}">
+          <span class="search-result-icon" style="background:${iconBg}; color:${iconColor};">${PAGE_HEADER_ICONS[iconKey]}</span>
+          <span class="search-result-title">${escapeHtml(it.title||'Sem título')}</span>
+          <span class="search-result-meta">${metaFn(it)}</span>
+        </div>
+      `).join('')}
+    `;
+  }
+  dd.innerHTML =
+    group('Tarefas', tasks, 'tasks', 'var(--primary-light)', 'var(--primary)', t => t.dueDate ? fmtDate(t.dueDate) : '') +
+    group('Notas', notes, 'notes', 'var(--accent-light)', 'var(--accent)', () => '') +
+    group('Eventos', events, 'calendar', 'var(--priority-baixa-light)', 'var(--priority-baixa)', ev => ev.date ? fmtDate(ev.date) : '');
+  if(window.innerWidth <= 768){
+    const wrapRect = document.getElementById('searchWrap').getBoundingClientRect();
+    dd.style.position = 'fixed';
+    dd.style.left = '16px';
+    dd.style.right = '16px';
+    dd.style.top = (wrapRect.bottom + 8) + 'px';
+  } else {
+    dd.style.position = '';
+    dd.style.left = '';
+    dd.style.right = '';
+    dd.style.top = '';
+  }
+  dd.querySelectorAll('.search-result-row').forEach(row => {
+    row.onclick = () => {
+      const kind = row.dataset.kind;
+      const id = row.dataset.id;
+      clearSearchTerm();
+      closeSearchResultsDropdown();
+      if(kind === 'tasks'){
+        currentView = 'tasks'; activeTaskId = id; creatingNewTask = false; render();
+      } else if(kind === 'notes'){
+        currentView = 'notes'; render();
+        const n = state.notes.find(x => x.id === id);
+        if(n) openNoteComposer(n);
+      } else if(kind === 'calendar'){
+        const ev = state.events.find(x => x.id === id);
+        if(ev) openEventComposer(ev);
+      }
+    };
+  });
+  dd.style.display = 'block';
+}
 document.getElementById('searchInput').addEventListener('input', e => {
   searchTerm = e.target.value;
   updateSearchClearBtnVisibility();
+  renderSearchResultsDropdown();
   render();
+});
+document.getElementById('searchInput').addEventListener('focus', () => {
+  if(searchTerm.trim()) renderSearchResultsDropdown();
 });
 document.getElementById('searchClearBtn').onclick = () => {
   const input = document.getElementById('searchInput');
   input.value = '';
   searchTerm = '';
   updateSearchClearBtnVisibility();
+  closeSearchResultsDropdown();
   input.focus();
   render();
 };
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('searchWrap');
+  if(wrap && !wrap.contains(e.target)) closeSearchResultsDropdown();
+});
 /* ===================== MENU DO AVATAR ===================== */
 document.getElementById('topbarAvatarBtn').onclick = (e) => {
   e.stopPropagation();
@@ -7321,7 +7430,7 @@ function render(){
   document.getElementById('notesView').style.display = currentView === 'notes' ? 'block' : 'none';
   document.getElementById('calendarView').style.display = currentView === 'calendar' ? 'block' : 'none';
   document.getElementById('settingsView').style.display = currentView === 'settings' ? 'block' : 'none';
-  document.getElementById('searchWrap').style.display = (currentView === 'settings' || currentView === 'calendar' || currentView === 'dashboard') ? 'none' : 'flex';
+  document.getElementById('searchWrap').style.display = 'flex';
   const addBtn = document.getElementById('primaryAddBtn');
   if(currentView === 'settings' || currentView === 'dashboard'){
     addBtn.style.display = 'none';

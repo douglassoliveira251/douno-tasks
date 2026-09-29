@@ -1,3 +1,13 @@
+## [1.10.081] - 2026-09-29 00:00
+
+### Added
+
+#### Busca
+
+- Busca global de verdade: o campo de busca agora aparece em todas as telas (antes só existia em Tarefas e Notas, sumia na Visão geral/Calendário/Configurações) e, ao digitar, mostra um menu com os resultados de tarefas, notas e eventos que combinam com o termo, agrupados por tipo. Clicar num resultado abre o item direto, de qualquer tela. Em Tarefas e Notas, a lista da própria tela continua filtrando ao vivo como já fazia, além do menu de resultados.
+
+
+
 ## [1.10.080] - 2026-09-29 00:00
 
 ### Changed
