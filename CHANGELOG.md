@@ -1,3 +1,20 @@
+## [1.10.073] - 2026-09-29 00:00
+
+### Fixed
+
+#### Topo das telas
+
+- Campo de busca estava com o mesmo fundo da página (cinza), quase invisível. Agora tem fundo branco e sombra leve, com destaque de verdade.
+
+### Changed
+
+#### Topo das telas
+
+- Ícones de ajuda/notificações e o chip de perfil ganharam sombra leve, para não ficarem "soltos" no fundo da página.
+- Card de título de cada tela ganhou mais presença: ícone da seção à esquerda, selo do espaço reduzido acima do título, e uma linha de estatísticas rápidas específica de cada tela (Tarefas: pendentes/vencidas/concluídas hoje; Notas: total/atualizadas hoje; Calendário: agendas hoje/no total). Visão geral e Configurações continuam só com ícone + título, sem a linha de estatísticas (a Visão geral já tem os cards de indicadores logo abaixo).
+
+
+
 ## [1.10.072] - 2026-09-28 00:00
 
 ### Added
