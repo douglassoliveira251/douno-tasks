@@ -1,3 +1,13 @@
+## [1.10.077] - 2026-09-29 00:00
+
+### Changed
+
+#### Calendário
+
+- Aplicado o mesmo padrão visual das outras telas: a barra de "Dia/Semana/Mês" + navegação ganhou um card com fundo e sombra (antes ficava solta no fundo da página), e a grade do mês, a grade da semana e as linhas do dia ganharam sombra leve, consistente com os cards elevados do resto do app.
+
+
+
 ## [1.10.076] - 2026-09-29 00:00
 
 ### Fixed

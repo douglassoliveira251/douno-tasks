@@ -1389,7 +1389,9 @@
 
     /* ===== Calendário ===== */
   .cal-header{
-    display:flex; align-items:center; gap:16px; margin-bottom:20px; flex-wrap:wrap;
+    display:flex; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap;
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:10px 16px; box-shadow:var(--shadow-sm);
   }
   .cal-view-toggle{display:flex; gap:2px; background:var(--surface-2); padding:3px; border-radius:8px;}
   .cal-view-toggle button{
@@ -1407,6 +1409,7 @@
 
   .cal-month-grid{
     display:grid; grid-template-columns:repeat(7,1fr); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;
+    box-shadow:var(--shadow-md);
   }
   .cal-month-weekday{
     padding:8px; text-align:center; font-size:11.5px; font-weight:600; color:var(--ink-faint);
@@ -1436,7 +1439,7 @@
   .cal-event-pill .dot{width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:4px;}
   .cal-event-more{font-size:10px; color:var(--ink-faint); padding-left:4px;}
 
-  .cal-week-wrap{border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface); display:flex; flex-direction:column;}
+  .cal-week-wrap{border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface); display:flex; flex-direction:column; box-shadow:var(--shadow-md);}
   .cal-week-headrow, .cal-week-alldayrow{display:grid; grid-template-columns:52px repeat(7,1fr); border-bottom:1px solid var(--border);}
   .cal-week-gutter-cell{border-right:1px solid var(--border);}
   .cal-week-colhead{
@@ -1482,6 +1485,7 @@
   .cal-day-row{
     display:flex; align-items:center; gap:14px; padding:12px 14px; background:var(--surface);
     border:1px solid var(--border); border-left-width:4px; border-radius:var(--radius); cursor:pointer;
+    box-shadow:var(--shadow-sm);
   }
   .cal-day-time{font-family:var(--font-mono); font-size:12.5px; color:var(--ink-soft); flex-shrink:0; width:110px;}
   .cal-day-title{font-weight:600; flex:1;}
@@ -4890,7 +4894,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.076';
+const APP_VERSION = '1.10.077';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
