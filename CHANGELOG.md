@@ -1,3 +1,34 @@
+## [1.10.069] - 2026-09-28 00:00
+
+### Added
+
+#### Calendário
+
+- Botão "Duplicar" na agenda em edição: cria uma cópia (título com sufixo "(cópia)", sem tarefa vinculada) na mesma data e já reabre o formulário nela editando, para trocar a data direto no campo.
+
+### Fixed
+
+#### Calendário
+
+- Vincular uma tarefa a uma agenda já existente estava sobrescrevendo a data/horário da agenda pelos dados da tarefa. Agora isso só acontece quando a agenda nasce a partir da tarefa (fluxo "criar agenda" nas tarefas); vincular uma tarefa a uma agenda criada direto no calendário mantém a data que já estava lá.
+
+### Changed
+
+#### Sobre (menu)
+
+- Identidade visual atualizada para o padrão Douno Tasks (logo "DOUNO" + "Tasks" em verde, com inversão de cor automática no tema escuro), no lugar do ícone/texto antigos do Taskin.
+
+#### Menu lateral
+
+- Modo reduzido: menu 2px mais largo, ícones um pouco maiores, e cada item passou a mostrar o nome abaixo do ícone (fonte bem pequena, branca, centralizada, truncada com reticências quando necessário).
+- Modo reduzido: adicionado o rótulo "Tasks" em verde abaixo do ícone "D".
+
+#### Tela inicial (login)
+
+- Bloco "DOUNO" + "Tasks" movido para o canto esquerdo do painel de marca, mantendo "Tasks" centralizado sob o "DOUNO" (antes o bloco inteiro ficava centralizado no painel).
+
+
+
 ## [1.10.068] - 2026-09-28 00:00
 
 ### Changed
