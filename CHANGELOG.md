@@ -1,3 +1,20 @@
+## [1.10.079] - 2026-09-29 00:00
+
+### Added
+
+#### Mobile
+
+- Suporte real a telas estreitas (celular), no lugar do antigo fallback que só escondia o menu sem dar nenhuma forma de acessá-lo:
+  - Menu lateral vira uma gaveta: botão de hambúrguer no topo abre um menu deslizante (com nome dos itens em tamanho legível, não só ícone), com fundo escurecido atrás; fecha ao tocar fora, ao escolher uma tela ou com Esc.
+  - Barra de busca, chip de perfil (só o avatar) e o card de título se ajustam à largura da tela.
+  - Notas: os dois painéis (Cadernos / nota) empilham em vez de ficar lado a lado espremidos.
+  - Calendário: mês inteiro cabe na tela, com os textos dos eventos truncados em vez de quebrar letra por letra.
+  - Painel de tarefa e painel de Ajuda passam a ocupar quase a tela toda (like um "modo cheio" mobile) em vez de manter a largura fixa de desktop, que vazava pra fora da tela.
+
+Testado via browser em 375px de largura, nas 5 telas e nos dois temas.
+
+
+
 ## [1.10.078] - 2026-09-29 00:00
 
 ### Changed

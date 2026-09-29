@@ -92,6 +92,14 @@
     grid-template-columns:92px 1fr;
     height:100vh;
   }
+  .mobile-menu-btn{
+    display:none; width:38px; height:38px; border-radius:50%; border:1px solid var(--border);
+    background:var(--surface); align-items:center; justify-content:center; color:var(--ink-soft);
+    box-shadow:var(--shadow-sm); flex-shrink:0;
+  }
+  .mobile-menu-btn svg{width:18px; height:18px;}
+  .sidebar-backdrop{display:none; position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:75;}
+  .sidebar-backdrop.show{display:block;}
   .nav-label,
   .settings-btn span{
     display:block; font-size:8.5px; font-weight:400; color:rgba(255,255,255,.72);
@@ -1674,9 +1682,52 @@
   ::-webkit-scrollbar-thumb{background:var(--border); border-radius:8px;}
   ::-webkit-scrollbar-track{background:transparent;}
 
-  @media (max-width:760px){
+  @media (max-width:768px){
+    :root{--edit-panel-width: calc(100vw - 24px);}
     .app{grid-template-columns:1fr;}
-    .sidebar{display:none;}
+    .mobile-menu-btn{display:flex;}
+    .sidebar{
+      position:fixed; top:0; left:0; bottom:0; z-index:80; width:250px;
+      margin:0; border-radius:0; height:100vh;
+      transform:translateX(-100%); transition:transform .2s;
+    }
+    .sidebar.mobile-open{transform:translateX(0); box-shadow:0 0 32px rgba(0,0,0,.35);}
+    .nav-item, .settings-btn{
+      flex-direction:row; justify-content:flex-start; gap:12px; padding:11px 14px; margin-bottom:0;
+    }
+    .nav-item svg, .settings-btn svg{width:19px; height:19px;}
+    .nav-label, .settings-btn span{
+      font-size:13.5px; text-align:left; color:rgba(255,255,255,.85); max-width:none; white-space:nowrap;
+    }
+    #themeToggleLabel{font-size:13.5px;}
+    .nav-item.active .nav-label{color:var(--primary-dark);}
+
+    .topbar{padding:14px 16px 6px; gap:8px;}
+    .search-wrap{width:auto; flex:1; min-width:0;}
+    .topbar-profile-name, .topbar-profile-chevron{display:none;}
+    .page-header-card{margin:8px 16px 4px; padding:14px 16px; flex-wrap:wrap; gap:10px;}
+    .page-header-icon{width:38px; height:38px; border-radius:10px;}
+    .page-header-icon svg{width:18px; height:18px;}
+    .view-title{font-size:19px;}
+    .page-header-stats{flex-wrap:wrap; row-gap:4px;}
+
+    .group-mode-bar{flex-wrap:wrap; row-gap:8px;}
+    .cal-header{padding:10px 12px;}
+    .cal-view-toggle button{padding:6px 10px; font-size:12px;}
+    .cal-period-label{font-size:14px; width:100%; order:3; margin-left:0;}
+    .cal-month-cell{min-height:64px; padding:4px;}
+    .cal-event-pill{
+      font-size:9.5px; padding:2px 5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      display:block;
+    }
+    .cal-event-pill .dot{display:none;}
+    .cal-month-weekday{font-size:10px; padding:6px 2px;}
+    .help-panel{width:calc(100vw - 32px);}
+    .icon-add-btn.fab.help-open, .icon-add-btn.fab.shifted{display:none;}
+
+    .notes-layout{flex-direction:column;}
+    .notebooks-col{width:100%; height:200px; flex-shrink:0;}
+    .note-detail-col{flex:1; min-height:0; padding:20px 20px;}
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -1730,10 +1781,14 @@
       </button>
     </div>
   </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <!-- MAIN -->
   <main class="main">
     <div class="topbar">
+      <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" title="Abrir menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
       <div class="search-wrap" id="searchWrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
         <input type="text" id="searchInput" placeholder="Buscar...">
@@ -3545,6 +3600,10 @@ document.addEventListener('keydown', (e) => {
   }
   if(document.getElementById('helpPanel').classList.contains('show')){
     closeHelpPanel();
+    return;
+  }
+  if(document.querySelector('.sidebar').classList.contains('mobile-open')){
+    closeMobileSidebar();
   }
 });
 
@@ -4894,7 +4953,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.078';
+const APP_VERSION = '1.10.079';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -7045,9 +7104,21 @@ document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
     creatingNewNote = false;
     pendingNoteNotebookId = null;
     clearSearchTerm();
+    closeMobileSidebar();
     render();
   };
 });
+
+function openMobileSidebar(){
+  document.querySelector('.sidebar').classList.add('mobile-open');
+  document.getElementById('sidebarBackdrop').classList.add('show');
+}
+function closeMobileSidebar(){
+  document.querySelector('.sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarBackdrop').classList.remove('show');
+}
+document.getElementById('mobileMenuBtn').onclick = openMobileSidebar;
+document.getElementById('sidebarBackdrop').onclick = closeMobileSidebar;
 
 function openSettingsView(tab){
   const panel = document.querySelector('.task-panel');
