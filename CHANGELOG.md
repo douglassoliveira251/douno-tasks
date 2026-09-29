@@ -1,3 +1,15 @@
+## [1.10.070] - 2026-09-28 00:00
+
+### Changed
+
+#### Menu lateral
+
+- Modo reduzido: menu +4px mais largo, mais espaçamento entre o ícone e o nome do item, fonte do nome menor e um pouco menos destacada (branco com opacidade, peso normal em vez de médio).
+- Modo reduzido: os botões "Modo escuro" e "Sobre" agora também mostram o nome abaixo do ícone, igual aos demais itens (antes ficavam só com o ícone).
+- Fundo do item selecionado mais destacado (verde com mais contraste contra o menu escuro).
+
+
+
 ## [1.10.069] - 2026-09-28 00:00
 
 ### Added
