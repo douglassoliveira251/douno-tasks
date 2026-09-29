@@ -89,30 +89,19 @@
 
   .app{
     display:grid;
-    grid-template-columns:252px 1fr;
+    grid-template-columns:92px 1fr;
     height:100vh;
-    transition:grid-template-columns .15s;
   }
-  .app.sidebar-collapsed{grid-template-columns:90px 1fr;}
-  .app.sidebar-collapsed .sidebar{padding:24px 10px;}
-  .app.sidebar-collapsed .brand-block{margin-bottom:26px;}
-  .app.sidebar-collapsed .brand{justify-content:center;}
-  .app.sidebar-collapsed .sidebar-mark-collapsed{display:flex !important;}
-  .app.sidebar-collapsed .sidebar-mark-expanded{display:none !important;}
-  .app.sidebar-collapsed .nav-item{flex-direction:column; justify-content:center; padding:8px 2px; gap:6px;}
-  .app.sidebar-collapsed .nav-item svg{width:20px; height:20px;}
-  .app.sidebar-collapsed .nav-label,
-  .app.sidebar-collapsed .settings-btn span{
+  .nav-label,
+  .settings-btn span{
     display:block; font-size:8.5px; font-weight:400; color:rgba(255,255,255,.72);
     text-align:center; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
   }
-  .app.sidebar-collapsed .nav-count,
-  .app.sidebar-collapsed .sidebar-section-label,
-  .app.sidebar-collapsed .cat-list{display:none;}
-  .app.sidebar-collapsed .cat-collapsed-btn{justify-content:center; padding:9px; gap:0;}
-  .app.sidebar-collapsed .settings-btn{flex-direction:column; justify-content:center; padding:8px 2px; gap:6px; margin-bottom:6px;}
-  .app.sidebar-collapsed .settings-btn svg{width:18px; height:18px;}
-  .app.sidebar-collapsed #sidebarCollapseIcon{transform:rotate(180deg);}
+  #themeToggleLabel{font-size:7.5px;}
+  .nav-count,
+  .sidebar-section-label,
+  .cat-list{display:none;}
+  .cat-collapsed-btn{justify-content:center; padding:9px; gap:0;}
   .cat-collapsed-wrap{margin-top:4px;}
   .cat-collapsed-btn{width:100%;}
   .cat-collapsed-popover{
@@ -149,21 +138,11 @@
     margin:16px 0 16px 16px;
     display:flex;
     flex-direction:column;
-    padding:24px 16px;
+    padding:24px 10px;
     position:relative;
   }
-  .sidebar-float-toggle{
-    position:absolute; top:36px; right:-12px; z-index:20;
-    width:24px; height:24px; border-radius:50%;
-    background:var(--surface-2); color:var(--primary); border:1px solid var(--border);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 2px 6px rgba(0,0,0,.28); cursor:pointer;
-  }
-  .sidebar-float-toggle svg{width:12px; height:12px; transition:transform .15s;}
-  .sidebar-float-toggle:hover{background:var(--primary-light); color:var(--primary-dark);}
-  .app.sidebar-collapsed .sidebar-float-toggle svg{transform:rotate(180deg);}
   .brand-block{
-    margin-bottom:20px;
+    margin-bottom:26px;
     padding-bottom:20px;
     border-bottom:1px solid var(--border);
     text-align:center;
@@ -175,7 +154,7 @@
     justify-content:center;
   }
   .sidebar-mark-collapsed{
-    display:none;
+    display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
@@ -184,7 +163,7 @@
   .sidebar-mark-collapsed svg{width:34px; height:34px;}
   .sidebar-mark-collapsed-sub{font-size:10px; font-weight:500; color:#10B981; line-height:1;}
   .sidebar-mark-expanded{
-    display:flex;
+    display:none;
     flex-direction:column;
     align-items:center;
     gap:4px;
@@ -269,14 +248,14 @@
   .avatar-dropdown-item.danger:hover{background:var(--danger-light);}
 
   .settings-btn{
-    display:flex; align-items:center; gap:9px;
-    padding:9px 10px; border-radius:var(--radius-sm);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    padding:8px 2px; border-radius:var(--radius-sm);
     border:none; background:transparent; color:var(--ink-soft);
-    font-size:13.5px; font-weight:500; text-align:left; margin-bottom:8px;
+    font-size:13.5px; font-weight:500; text-align:left; margin-bottom:6px;
   }
   .settings-btn:hover{background:var(--surface-2); color:var(--ink);}
   .settings-btn.active{background:var(--primary-light); color:var(--primary-dark); font-weight:600;}
-  .settings-btn svg{width:16px; height:16px; flex-shrink:0;}
+  .settings-btn svg{width:18px; height:18px; flex-shrink:0;}
 
   .settings-tabs{
     display:flex; gap:4px; border-bottom:1px solid var(--border);
@@ -315,8 +294,8 @@
 
   .nav{display:flex; flex-direction:column; gap:2px; margin-bottom:22px;}
   .nav-item{
-    display:flex; align-items:center; gap:10px;
-    padding:9px 10px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    padding:8px 2px;
     border-radius:var(--radius-sm);
     border:none; background:transparent;
     color:var(--ink-soft);
@@ -324,7 +303,7 @@
     text-align:left;
     transition:background .15s, color .15s;
   }
-  .nav-item svg{width:17px; height:17px; flex-shrink:0;}
+  .nav-item svg{width:20px; height:20px; flex-shrink:0;}
   .nav-item:hover{background:var(--surface-2); color:var(--ink);}
   .nav-item.active{background:rgba(16,185,129,.18); color:var(--primary-dark); font-weight:600;}
   .nav-count{
@@ -1671,9 +1650,6 @@
 <div class="app">
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebarEl">
-    <button class="sidebar-float-toggle" id="toggleSidebarBtn" title="Minimizar menu">
-      <svg id="sidebarCollapseIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg>
-    </button>
     <div class="brand-block">
       <div class="brand">
         <div class="sidebar-mark-collapsed">
@@ -1928,7 +1904,6 @@ document.getElementById('aboutOverlay').addEventListener('click', e => {
 });
 
 document.getElementById('toggleThemeBtn').onclick = toggleTheme;
-document.getElementById('toggleSidebarBtn').onclick = toggleSidebarCollapsed;
 
 function normalizeState(){
   if(!state.profile) state.profile = { name:'', email:'', avatar:null };
@@ -1957,7 +1932,6 @@ function normalizeState(){
   if(!state.calendarHourDensity) state.calendarHourDensity = 'normal';
   if(!state.calendarViewDefault) state.calendarViewDefault = 'month';
   if(state.weekStartDay === undefined) state.weekStartDay = 0;
-  if(state.sidebarCollapsed === undefined) state.sidebarCollapsed = false;
   if(!Array.isArray(state.notebooks)) state.notebooks = [];
   if(!state.lastActiveNoteBySpace || typeof state.lastActiveNoteBySpace !== 'object') state.lastActiveNoteBySpace = {};
   state.categories.forEach(cat => {
@@ -2322,18 +2296,6 @@ function spawnNextRecurrence(task){
 }
 
 /* ===================== RENDER: SIDEBAR ===================== */
-function applySidebarCollapsed(){
-  const collapsed = !!state.sidebarCollapsed;
-  const app = document.querySelector('.app');
-  if(app) app.classList.toggle('sidebar-collapsed', collapsed);
-  const btn = document.getElementById('toggleSidebarBtn');
-  if(btn) btn.title = collapsed ? 'Expandir menu' : 'Minimizar menu';
-}
-function toggleSidebarCollapsed(){
-  state.sidebarCollapsed = !state.sidebarCollapsed;
-  applySidebarCollapsed();
-  markDirty();
-}
 function closeCatCollapsedPopover(){
   const p = document.getElementById('catCollapsedPopover');
   if(p) p.remove();
@@ -4775,7 +4737,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.070';
+const APP_VERSION = '1.10.071';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -7213,7 +7175,6 @@ function render(){
     lastRenderedView = currentView;
     refreshFromCloudIfSafe();
   }
-  applySidebarCollapsed();
   renderSpaceSelector();
   document.getElementById('viewTitle').textContent = VIEW_TITLES[currentView];
   const subtitleEl = document.getElementById('viewSubtitle');

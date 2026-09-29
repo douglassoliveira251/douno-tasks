@@ -1,3 +1,20 @@
+## [1.10.071] - 2026-09-28 00:00
+
+### Removed
+
+#### Menu lateral
+
+- Removido o modo expandido do menu e o botão de minimizar/expandir. O menu agora é sempre o compacto (ícone + nome pequeno abaixo), sem alternância.
+
+### Changed
+
+#### Menu lateral
+
+- Mais 2px de largura (90px → 92px).
+- Fonte do rótulo "Modo escuro" reduzida para caber sem cortar (os demais itens continuam no tamanho anterior).
+
+
+
 ## [1.10.070] - 2026-09-28 00:00
 
 ### Changed
