@@ -1,3 +1,18 @@
+## [1.10.082] - 2026-09-29 00:00
+
+### Fixed
+
+#### Sincronização com a nuvem
+
+- **Correção importante**: uma escrita na nuvem que falhasse (rede instável, aparelho hibernando no meio do envio, erro do Supabase) era tratada como se tivesse dado certo — o app zerava a marca de "alterações pendentes" mesmo sem ter salvo nada. Com essa marca mentindo, ao voltar o foco pra janela (ex. "depois de um tempo que eu volto na tela") o app buscava o estado antigo do servidor e sobrescrevia silenciosamente a edição que nunca chegou a ser salva — comentários, mudança de status etc. pareciam simplesmente sumir. Agora, se a escrita falhar, o app mantém a marca de pendente (bloqueando essa busca), tenta salvar de novo automaticamente, e mostra um aviso visível ("Falha ao salvar") na barra superior, clicável para tentar na hora. Essa correção é na camada compartilhada de salvamento — vale para Tarefas, Notas e Calendário igualmente, e para qualquer tela nova que vier a usar o mesmo mecanismo.
+- Um comentário digitado no painel de tarefa mas não enviado (sem clicar em "Adicionar") também podia se perder se a aba fosse escondida ou fechada nesse meio tempo. Agora é salvo automaticamente nesses momentos, do mesmo jeito que já acontecia com notas.
+
+#### Menu lateral
+
+- Depois de atualizar a página (ou voltar de uma sessão restaurada), o item destacado no menu podia não bater com a tela realmente carregada — ficava sempre marcando "Visão geral" até o próximo clique, mesmo estando em outra tela. Corrigido: o destaque agora é recalculado a cada atualização de tela.
+
+
+
 ## [1.10.081] - 2026-09-29 00:00
 
 ### Added

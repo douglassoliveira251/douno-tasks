@@ -496,6 +496,14 @@
   .search-result-meta{font-size:11px; color:var(--ink-faint); flex-shrink:0; white-space:nowrap;}
   .search-results-empty{padding:18px 10px; text-align:center; font-size:12.5px; color:var(--ink-faint);}
 
+  .save-error-badge{
+    display:none; align-items:center; gap:6px; padding:0 14px; height:38px; flex-shrink:0;
+    background:var(--danger-light); color:var(--danger); border:1px solid var(--danger);
+    border-radius:999px; font-size:12.5px; font-weight:600; white-space:nowrap;
+  }
+  .save-error-badge:hover{filter:brightness(.96);}
+  .save-error-badge svg{width:15px; height:15px; flex-shrink:0;}
+
   .file-bar{
     display:flex; align-items:center; gap:6px; margin-left:auto; flex-shrink:0;
   }
@@ -1735,6 +1743,8 @@
     .topbar{padding:14px 16px 6px; gap:8px;}
     .search-wrap{width:auto; flex:1; min-width:0;}
     .topbar-profile-name, .topbar-profile-chevron{display:none;}
+    .save-error-badge{width:38px; padding:0; justify-content:center;}
+    .save-error-badge .badge-text{display:none;}
     .page-header-card{margin:8px 16px 4px; padding:14px 16px; flex-wrap:wrap; gap:10px;}
     .page-header-icon{width:38px; height:38px; border-radius:10px;}
     .page-header-icon svg{width:18px; height:18px;}
@@ -1826,6 +1836,10 @@
         <div class="search-results-dropdown" id="searchResultsDropdown" style="display:none;"></div>
       </div>
       <div class="topbar-right-group">
+        <button type="button" class="save-error-badge" id="saveErrorBadge" style="display:none;" title="Clique para tentar salvar de novo agora">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          <span class="badge-text">Falha ao salvar</span>
+        </button>
         <button class="notification-btn" id="helpBtn" title="Ajuda">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4"/><path d="M12 17h.01"/></svg>
         </button>
@@ -2141,6 +2155,7 @@ function closeHelpPanel(){
   document.getElementById('primaryAddBtn').classList.remove('help-open');
 }
 document.getElementById('helpBtn').onclick = openHelpPanel;
+document.getElementById('saveErrorBadge').onclick = () => { if(cloudSession) triggerCloudWrite(); };
 document.getElementById('helpCloseBtn').onclick = closeHelpPanel;
 document.getElementById('helpPanelBackdrop').onclick = closeHelpPanel;
 
@@ -2257,22 +2272,42 @@ const AUTOSAVE_DEBOUNCE_MS = 250;
    markDirty/persistOnly só chamam isto, sem saber qual backend está ativo. */
 let cloudWriteInFlight = null;
 let cloudWritePending = false;
+let cloudWriteFailed = false;
+let cloudWriteRetryTimer = null;
 /* Sem debounce pra nuvem: um refresh (beforeunload/pagehide) nao espera uma
    escrita assincrona terminar, entao um commit adiado alguns ms podia nunca
    chegar ao Supabase e um refresh logo em seguida lia dados desatualizados.
    Escreve na hora, mas nunca mais de uma escrita em paralelo - um commit que
    chega enquanto outra escrita ja esta em voo so marca "pendente" e dispara
    de novo (com o estado mais atual) assim que a atual terminar, garantindo
-   que a ultima escrita a chegar no banco sempre reflete a ultima edicao. */
+   que a ultima escrita a chegar no banco sempre reflete a ultima edicao.
+
+   Bug real corrigido aqui: antes, uma escrita que falhava (rede instavel,
+   maquina dormindo no meio do envio, erro do Supabase) caia no .catch(), que so
+   logava o erro no console e deixava o .then() seguinte rodar do mesmo jeito -
+   e o .then() zerava `dirty` incondicionalmente, como se tivesse salvo com
+   sucesso. Com `dirty` mentindo que estava tudo salvo, um refreshFromCloudIfSafe
+   seguinte (ex. ao voltar o foco pra janela depois de um tempo) buscava o
+   estado antigo do servidor e sobrescrevia a edicao que nunca chegou a ser
+   salva, apagando-a silenciosamente. Agora, em caso de erro, `dirty` continua
+   true (bloqueando o refresh) e a escrita e tentada de novo automaticamente. */
 function triggerCloudWrite(){
   if(cloudWriteInFlight){ cloudWritePending = true; return; }
+  clearTimeout(cloudWriteRetryTimer);
   cloudWriteInFlight = writeStateToCloud()
-    .catch(e => console.error('Auto-save na nuvem falhou', e))
     .then(() => {
       cloudWriteInFlight = null;
+      cloudWriteFailed = false;
       dirty = false;
       updateFileStatus();
       if(cloudWritePending){ cloudWritePending = false; triggerCloudWrite(); }
+    })
+    .catch(e => {
+      console.error('Auto-save na nuvem falhou', e);
+      cloudWriteInFlight = null;
+      cloudWriteFailed = true;
+      updateFileStatus();
+      cloudWriteRetryTimer = setTimeout(triggerCloudWrite, 8000);
     });
 }
 
@@ -2323,6 +2358,16 @@ function commitOpenEditors(){
   if(currentNoteComposerCommit){
     try{ currentNoteComposerCommit(); }catch(e){ console.error(e); }
   }
+  /* Título e descrição da tarefa já commitam no blur (protegidos pelo blur()
+     genérico abaixo). O campo de novo comentário é a exceção: só grava quando
+     o usuário clica em "Adicionar", então um rascunho digitado ali e nunca
+     enviado ficava só na memória do DOM — se a aba fosse escondida/fechada
+     nesse meio tempo, o rascunho se perdia sem nenhum aviso. */
+  const newCommentBox = document.getElementById('tpNewComment');
+  if(newCommentBox && newCommentBox.value.trim()){
+    const addBtn = document.getElementById('tpAddCommentBtn');
+    if(addBtn) try{ addBtn.click(); }catch(e){ console.error(e); }
+  }
   if(document.activeElement && typeof document.activeElement.blur === 'function'){
     try{ document.activeElement.blur(); }catch(e){}
   }
@@ -2363,8 +2408,10 @@ function updateFileStatus(){
   const textSettings = document.getElementById('statusTextSettings');
   const cls = 'status-dot ' + (dirty ? 'dirty' : 'saved');
   const title = dirty ? 'Alterações não salvas' : 'Sincronizado';
+  const badge = document.getElementById('saveErrorBadge');
+  if(badge) badge.style.display = cloudWriteFailed ? 'flex' : 'none';
   if(cloudSession){
-    if(dotSettings){ dotSettings.className = cls; dotSettings.title = title; }
+    if(dotSettings){ dotSettings.className = cloudWriteFailed ? 'status-dot dirty' : cls; dotSettings.title = cloudWriteFailed ? 'Falha ao salvar na nuvem — tentando de novo' : title; }
     if(textSettings) textSettings.textContent = `${cloudSession.user.email} (nuvem)`;
   } else if(fileHandle){
     const name = fileHandle.name || 'taskin.json';
@@ -4988,7 +5035,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.081';
+const APP_VERSION = '1.10.082';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -7132,8 +7179,6 @@ document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
       document.activeElement.blur();
     }
     currentView = btn.dataset.view;
-    document.querySelectorAll('.nav-item[data-view]').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
     activeTaskId = null;
     creatingNewTask = false;
     creatingNewNote = false;
@@ -7162,7 +7207,6 @@ function openSettingsView(tab){
   }
   currentView = 'settings';
   if(tab) settingsTab = tab;
-  document.querySelectorAll('.nav-item[data-view]').forEach(b=>b.classList.remove('active'));
   activeTaskId = null;
   creatingNewTask = false;
   creatingNewNote = false;
@@ -7415,6 +7459,7 @@ function render(){
     refreshFromCloudIfSafe();
   }
   renderSpaceSelector();
+  document.querySelectorAll('.nav-item[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === currentView));
   document.getElementById('viewTitle').textContent = VIEW_TITLES[currentView];
   renderPageHeaderMeta();
   const subtitleEl = document.getElementById('viewSubtitle');
