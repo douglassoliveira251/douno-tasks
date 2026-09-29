@@ -1,3 +1,21 @@
+## [1.10.075] - 2026-09-29 00:00
+
+### Changed
+
+#### Visão geral
+
+- Dashboard redesenhado: os 5 cards de indicador viraram 4 (removido "Tags mais usadas", que era mais decorativo que útil); o gráfico de rosca de "Tarefas por prioridade" virou barras horizontais; "Indicadores gerais" foi incorporado ao novo card "Progresso" (junto com as barras de prioridade); "Notas recentes" foi removido (redundante com o card de indicador "Notas" e a própria tela de Notas). Ícones dos cards de indicador em quadrado colorido (em vez de círculo) e cards com sombra leve, consistente com o resto do app.
+
+#### Tarefas
+
+- Barra de "Agrupar por / Filtros / Tags / Mostrar concluídas" ganhou um card próprio com fundo e sombra (antes era texto solto direto no fundo da página). Cada tarefa da lista passou a ser um card elevado (com sombra e cantos arredondados), em vez de uma linha plana dentro de uma caixa compartilhada.
+
+#### Notas
+
+- Painel de cadernos e a área da nota (editor ou o "selecione uma nota") viraram dois cards separados, com espaçamento e sombra entre eles, em vez de um painel único dividido por uma borda interna. Aproveitei pra corrigir também a altura do painel: usava um valor fixo (`100vh - 94px`) calibrado pro topo antigo, que ficou defasado depois da reforma do topo e deixava sobrar espaço vazio embaixo — agora usa flexbox e se ajusta sozinho a qualquer altura de topo.
+
+
+
 ## [1.10.074] - 2026-09-29 00:00
 
 ### Fixed

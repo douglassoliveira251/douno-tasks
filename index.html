@@ -512,6 +512,8 @@
   .tasks-layout{ display:flex; gap:20px; align-items:flex-start; }
   .group-mode-bar{
     display:flex; align-items:center; gap:10px; margin-bottom:16px;
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:10px 16px; box-shadow:var(--shadow-sm);
   }
   .group-mode-label{font-size:12px; color:var(--ink-faint); font-weight:500;}
   .group-mode-select-wrap{position:relative;}
@@ -611,22 +613,19 @@
   .bucket-chevron svg{width:14px; height:14px;}
   .bucket.collapsed .bucket-chevron{transform:rotate(-90deg);}
   .bucket.collapsed .bucket-body{display:none;}
-  .bucket-body{
-    background:var(--surface); border:1px solid var(--border);
-    border-radius:var(--radius); overflow:hidden;
-  }
+  .bucket-body{display:flex; flex-direction:column; gap:8px;}
   .task-row{
     display:flex; align-items:center; gap:10px;
     padding:10px 14px 10px 10px;
-    border-bottom:1px solid var(--border);
-    border-left:4px solid transparent;
+    background:var(--surface); border:1px solid var(--border);
+    border-left:4px solid transparent; border-radius:var(--radius);
+    box-shadow:var(--shadow-sm);
     font-size:13px; cursor:pointer; position:relative;
   }
   .task-row.pri-baixa{border-left-color:var(--priority-baixa);}
   .task-row.pri-media{border-left-color:var(--priority-media);}
   .task-row.pri-alta{border-left-color:var(--priority-alta);}
   .task-row.pri-critica{border-left-color:var(--priority-critica);}
-  .task-row:last-child{border-bottom:none;}
   .task-row:hover{background:var(--bg);}
   .task-row.selected{background:var(--primary-light);}
   .task-check{
@@ -986,11 +985,11 @@
     padding:0;
   }
 
-  #notesView{overflow:hidden !important; padding-bottom:0 !important;}
-  .notes-layout{display:flex; align-items:stretch; height:calc(100vh - 94px); margin:-24px -28px 0; border-top:1px solid var(--border);}
+  #notesView{overflow:hidden !important; display:flex; flex-direction:column;}
+  .notes-layout{display:flex; gap:14px; align-items:stretch; flex:1; min-height:0;}
   .notebooks-col{
     width:260px; flex-shrink:0; display:flex; flex-direction:column; position:relative;
-    border-right:1px solid var(--border);
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm);
     padding:16px 12px 16px 8px; height:100%; overflow-y:auto; box-sizing:border-box;
   }
   .notebooks-col-resize-handle{
@@ -1069,7 +1068,8 @@
 
   .note-detail-col{
     flex:1; min-width:0; height:100%; overflow-y:auto;
-    background:var(--surface); padding:26px 40px;
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm);
+    padding:26px 40px; box-sizing:border-box;
   }
   .note-detail-empty{
     height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
@@ -1237,15 +1237,14 @@
   .dash-header-actions .btn svg{width:14px; height:14px;}
 
   .dash-alert-cards{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
-  .dash-alert-cards.dash-kpi-5{grid-template-columns:repeat(5,1fr);}
   .dash-alert-card{
     background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-    padding:16px;
+    padding:16px; box-shadow:var(--shadow-sm);
   }
   .dash-alert-card-top{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
   .dash-alert-label{font-size:12px; color:var(--ink-soft); font-weight:600;}
   .dash-alert-icon{
-    width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
   .dash-alert-icon svg{width:17px; height:17px;}
   .dash-alert-icon.danger{background:var(--danger-light); color:var(--danger);}
@@ -1260,9 +1259,6 @@
   .dash-kpi-progress-fill{height:100%; border-radius:20px; background:var(--priority-media);}
   .dash-kpi-progress-label{font-size:11px; color:var(--ink-faint); text-align:right; margin-top:3px;}
   .dash-kpi-spark{margin-top:8px; line-height:0;}
-  .dash-kpi-tags-row{display:flex; flex-wrap:wrap; gap:5px; margin-top:8px;}
-  .dash-kpi-tag-pill{font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px;}
-  .dash-kpi-tag-more{font-size:11px; color:var(--ink-faint); padding:2px 4px;}
   .dash-kpi-link{font-size:12px; font-weight:600; color:var(--primary); margin-top:10px;}
 
   .dash-critical-banner{
@@ -1271,13 +1267,14 @@
   }
   .dash-critical-banner svg{width:18px; height:18px; flex-shrink:0;}
 
-  .dash-section{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; min-width:0;}
+  .dash-section{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; min-width:0; box-shadow:var(--shadow-sm);}
   .dash-section-title{
     display:flex; align-items:center; gap:8px;
     font-family:var(--font-display); font-weight:600; font-size:13px; margin-bottom:10px;
   }
   .dash-section-title svg{width:16px; height:16px; flex-shrink:0;}
   .dash-grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .dash-grid-main{display:grid; grid-template-columns:1.3fr 1fr; gap:16px; align-items:stretch;}
   .dash-grid-priority-prod{display:grid; grid-template-columns:2fr 3fr; gap:16px;}
   .dash-grid-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; align-items:stretch;}
   .dash-section-stack{display:flex; flex-direction:column; gap:16px;}
@@ -1326,7 +1323,6 @@
   .dash-prod-stat-value{font-family:var(--font-display); font-size:22px; font-weight:700; margin-top:2px;}
   .dash-prod-extra{display:flex; flex-direction:column; gap:4px; margin-top:12px; font-size:11.5px; color:var(--ink-soft);}
 
-  .dash-donut-row{display:flex; align-items:center; gap:28px; padding:6px 0;}
   .dash-activity-list{display:flex; flex-direction:column; gap:2px;}
   .dash-activity-row{display:flex; align-items:flex-start; gap:10px; padding:8px 4px; border-radius:8px;}
   .dash-activity-icon{
@@ -1354,16 +1350,6 @@
   .dash-upcoming-title{font-size:12px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .dash-upcoming-sub{font-size:11.5px; color:var(--ink-faint); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 
-  .dash-notelist{display:flex; flex-direction:column;}
-  .dash-notelist-row{display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid var(--border); cursor:pointer;}
-  .dash-notelist-row:last-child{border-bottom:none;}
-  .dash-notelist-row:hover{background:var(--surface-2);}
-  .dash-notelist-icon{width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
-  .dash-notelist-icon svg{width:14px; height:14px;}
-  .dash-notelist-title{flex:1; min-width:0; font-size:12.5px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .dash-notelist-cat{font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; flex-shrink:0;}
-  .dash-notelist-time{font-size:11px; color:var(--ink-faint); flex-shrink:0; white-space:nowrap;}
-
   .dash-tasklist{display:flex; flex-direction:column;}
   .dash-tasklist-row{display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid var(--border); cursor:pointer;}
   .dash-tasklist-row:last-child{border-bottom:none;}
@@ -1375,26 +1361,9 @@
   .dash-tasklist-flag{width:14px; height:14px; color:var(--ink-faint); flex-shrink:0;}
   .dash-tasklist-flag.filled{color:var(--danger);}
   .dash-tasklist-flag svg{width:100%; height:100%;}
-  .dash-donut-wrap{position:relative; flex-shrink:0; display:flex; align-items:center; justify-content:center;}
-  .dash-donut-center{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; pointer-events:none;}
-  .dash-donut-center-num{font-family:var(--font-display); font-size:24px; font-weight:600; line-height:1;}
-  .dash-donut-center-label{font-size:10.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.03em; margin-top:2px;}
-  .dash-donut-legend{display:flex; flex-direction:column; gap:12px; font-size:13px; flex:1;}
-  .dash-legend-row{display:flex; align-items:center; gap:8px;}
-  .dash-legend-row .dot{width:10px; height:10px; border-radius:50%; flex-shrink:0;}
-  .dash-legend-name{color:var(--ink-soft); font-weight:600;}
-  .dash-legend-count{margin-left:auto; font-family:var(--font-display); font-weight:700; font-size:13px;}
-  .dash-legend-pct{width:40px; text-align:right; font-size:11.5px; color:var(--ink-faint); font-family:var(--font-mono);}
   .dash-prod-stats{display:flex; flex-direction:column; gap:4px; margin-top:10px; font-size:12.5px; color:var(--ink-soft);}
   .dash-avg-priority{font-size:11.5px;}
 
-  .dash-kpi-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
-  .dash-kpi-card{background:var(--surface-2); border-radius:8px; padding:12px;}
-  .dash-kpi-value{font-family:var(--font-display); font-size:17px; font-weight:700;}
-  .dash-kpi-trend{font-size:12px; font-weight:600;}
-  .dash-kpi-trend.up{color:var(--priority-media);}
-  .dash-kpi-trend.down{color:var(--danger);}
-  .dash-kpi-label{font-size:11.5px; color:var(--ink-soft); margin-top:3px;}
   .dash-catload-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px;}
   .dash-catload-pill{
     display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600;
@@ -1409,10 +1378,10 @@
   }
   @media (max-width: 1000px){
     .dash-grid-3{grid-template-columns:1fr;}
+    .dash-grid-main{grid-template-columns:1fr;}
   }
   @media (max-width: 900px){
-    .dash-alert-cards, .dash-kpi-grid{grid-template-columns:repeat(2,1fr);}
-    .dash-alert-cards.dash-kpi-5{grid-template-columns:repeat(2,1fr);}
+    .dash-alert-cards{grid-template-columns:repeat(2,1fr);}
     .dash-grid-2{grid-template-columns:1fr;}
     .dash-grid-priority-prod{grid-template-columns:1fr;}
     .dash-notes-strip{grid-template-columns:repeat(2,1fr);}
@@ -4921,7 +4890,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.074';
+const APP_VERSION = '1.10.075';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -4961,29 +4930,6 @@ function startOfWeekStr(dateStr){
 }
 
 /* ===================== DASHBOARD ===================== */
-function svgDonutChart(segments, size){
-  const total = segments.reduce((s,x)=>s+x.value,0);
-  const r = size/2 - 6;
-  const cx = size/2, cy = size/2;
-  if(total <= 0){
-    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="10"></circle></svg>`;
-  }
-  let startAngle = -90;
-  let paths = '';
-  segments.forEach(seg => {
-    if(seg.value <= 0) return;
-    const angle = (seg.value/total)*360;
-    const endAngle = startAngle + angle;
-    const largeArc = angle > 180 ? 1 : 0;
-    const x1 = cx + r*Math.cos(startAngle*Math.PI/180);
-    const y1 = cy + r*Math.sin(startAngle*Math.PI/180);
-    const x2 = cx + r*Math.cos(endAngle*Math.PI/180);
-    const y2 = cy + r*Math.sin(endAngle*Math.PI/180);
-    paths += `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${seg.color}"></path>`;
-    startAngle = endAngle;
-  });
-  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${paths}<circle cx="${cx}" cy="${cy}" r="${r*0.58}" fill="var(--surface)"></circle></svg>`;
-}
 function svgSparkline(values, width, height, color){
   const max = Math.max(1, ...values);
   const stepX = width / Math.max(1, values.length - 1);
@@ -5052,15 +4998,6 @@ function renderDashboard(){
   const kpiTodayEvents = todayEvents;
   const nowTimeStr = new Date().toTimeString().slice(0,5);
   const kpiNextEvent = kpiTodayEvents.find(ev => !ev.startTime || ev.startTime >= nowTimeStr) || kpiTodayEvents[0] || null;
-
-  // Card: Tags mais usadas
-  const tagUsage = {};
-  scopeTasks.forEach(t => (t.tagIds||[]).forEach(id => { tagUsage[id] = (tagUsage[id]||0)+1; }));
-  scopeNotes.forEach(n => (n.tagIds||[]).forEach(id => { tagUsage[id] = (tagUsage[id]||0)+1; }));
-  const usedTagIds = Object.keys(tagUsage);
-  const topTags = usedTagIds
-    .map(id => state.tags.find(t=>t.id===id)).filter(Boolean)
-    .sort((a,b) => tagUsage[b.id]-tagUsage[a.id]);
 
   // Card: Itens importantes (tarefas alta/critica em aberto + notas fixadas)
   const importantTasks = open.filter(t => t.priority==='alta' || t.priority==='critica');
@@ -5146,7 +5083,6 @@ function renderDashboard(){
   const priorityCounts = PRIORITY_CONFIG.slice().reverse().map(p => ({ ...p, count: open.filter(t=>t.priority===p.key).length }));
   const maxPriorityCount = Math.max(1, ...priorityCounts.map(p=>p.count));
 
-  const recentNotes = scopeNotes.slice().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,5);
   const upcomingEvents = scopeEvents.filter(ev => ev.date >= todayS).sort((a,b)=> (a.date+((a.startTime)||'00:00')).localeCompare(b.date+((b.startTime)||'00:00'))).slice(0,6);
 
   const noTagOpen = open.filter(t => !(t.tagIds||[]).length);
@@ -5169,7 +5105,7 @@ function renderDashboard(){
 
   view.innerHTML = `
     <div class="dash-wrap">
-      <div class="dash-alert-cards dash-kpi-5">
+      <div class="dash-alert-cards">
         <div class="dash-alert-card">
           <div class="dash-alert-card-top"><span class="dash-alert-icon info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span><span class="dash-alert-label">Tarefas</span></div>
           <div class="dash-alert-num">${kpiTasksTotal}</div>
@@ -5192,16 +5128,6 @@ function renderDashboard(){
           <div class="dash-kpi-link">Ver calendário →</div>
         </div>
 
-        <div class="dash-alert-card dash-kpi-clickable" id="dashKpiTagsCard">
-          <div class="dash-alert-card-top"><span class="dash-alert-icon warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83A2 2 0 009.59 3.24H4a1 1 0 00-1 1v5.59a2 2 0 00.59 1.41l9.58 9.59a2 2 0 002.83 0l4.59-4.59a2 2 0 000-2.83z"/><circle cx="7.5" cy="7.5" r="1.25"/></svg></span><span class="dash-alert-label">Tags mais usadas</span></div>
-          <div class="dash-alert-num">${usedTagIds.length}</div>
-          <div class="dash-kpi-tags-row">
-            ${topTags.slice(0,3).map(tg => `<span class="dash-kpi-tag-pill" style="background:${tg.color}22; color:${tg.color};">${escapeHtml(tg.name)}</span>`).join('')}
-            ${topTags.length>3 ? `<span class="dash-kpi-tag-more">+${topTags.length-3}</span>` : ''}
-          </div>
-          <div class="dash-kpi-link">Ver todas as tags →</div>
-        </div>
-
         <div class="dash-alert-card dash-kpi-clickable" id="dashKpiImportantCard">
           <div class="dash-alert-card-top"><span class="dash-alert-icon danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></span><span class="dash-alert-label">Itens importantes</span></div>
           <div class="dash-alert-num">${kpiImportantTotal}</div>
@@ -5210,29 +5136,27 @@ function renderDashboard(){
         </div>
       </div>
 
-      <div class="dash-grid-3">
+      <div class="dash-grid-main">
         <div class="dash-section">
-          <h3 class="dash-section-title">Tarefas por prioridade</h3>
-          <div class="dash-donut-row">
-            <div class="dash-donut-wrap">
-              ${svgDonutChart(priorityCounts.map(p=>({value:p.count, color:p.color})), 150)}
-              <div class="dash-donut-center">
-                <div class="dash-donut-center-num">${open.length}</div>
-                <div class="dash-donut-center-label">total</div>
+          <h3 class="dash-section-title">Progresso</h3>
+          <div class="dash-priority-bars">
+            ${priorityCounts.map(p => `
+              <div>
+                <div class="dash-priority-row-top"><span class="dot" style="background:${p.color}"></span>${p.label}<span class="dash-priority-frac">${p.count}</span></div>
+                <div class="dash-priority-track"><div class="dash-priority-fill" style="width:${Math.round(p.count/maxPriorityCount*100)}%; background:${p.color};"></div></div>
               </div>
-            </div>
-            <div class="dash-donut-legend">
-              ${priorityCounts.map(p => `
-                <div class="dash-legend-row">
-                  <span class="dot" style="background:${p.color}"></span>
-                  <span class="dash-legend-name">${p.label}</span>
-                  <span class="dash-legend-count">${p.count}</span>
-                  <span class="dash-legend-pct">${open.length ? Math.round(p.count/open.length*100) : 0}%</span>
-                </div>
-              `).join('')}
-            </div>
+            `).join('')}
           </div>
-          <div class="dash-kpi-link" id="dashSeeAllTasksLink" style="margin-top:12px;">Ver todas as tarefas →</div>
+          <div class="dash-prod-stat-row" style="margin-top:16px;">
+            <div class="dash-prod-stat-box"><div class="dash-prod-stat-value">${conclusionRate}%</div><div class="dash-prod-stat-label">Taxa de conclusão</div></div>
+            <div class="dash-prod-stat-box"><div class="dash-prod-stat-value">${overdue.length} / ${open.length}</div><div class="dash-prod-stat-label">Em atraso</div></div>
+            <div class="dash-prod-stat-box"><div class="dash-prod-stat-value">${createdLast30.length} / ${completedLast30.length}</div><div class="dash-prod-stat-label">Criadas / concluídas (30d)</div></div>
+          </div>
+          ${catLoadList.length ? `
+          <div class="dash-catload-row" style="margin-top:14px;">
+            ${catLoadList.map(x => `<span class="dash-catload-pill" style="background:${x.cat.color}22; color:${x.cat.color};"><span class="dot" style="background:${x.cat.color}"></span>${escapeHtml(x.cat.name)}: ${x.count}</span>`).join('')}
+          </div>` : ''}
+          <div class="dash-kpi-link" id="dashSeeAllTasksLink" style="margin-top:14px;">Ver todas as tarefas →</div>
         </div>
 
         <div class="dash-section">
@@ -5251,7 +5175,9 @@ function renderDashboard(){
           </div>` : emptyDashState('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>', 'Nenhuma atividade ainda.')}
           <div class="dash-kpi-link" id="dashSeeAllActivityLink" style="margin-top:12px;">Ver todas as atividades →</div>
         </div>
+      </div>
 
+      <div class="dash-grid-2">
         <div class="dash-section">
           <div class="dash-strip-header">
             <h3 class="dash-section-title" style="margin-bottom:0;">Próximos eventos</h3>
@@ -5268,52 +5194,6 @@ function renderDashboard(){
             }).join('')}
           </div>` : emptyDashState('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>', 'Nenhum evento futuro.')}
           <div class="dash-kpi-link" id="dashSeeAllEventsLink" style="margin-top:12px;">Ver todos os eventos →</div>
-        </div>
-      </div>
-
-      <div class="dash-section">
-        <h3 class="dash-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="var(--ink-soft)" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>Indicadores gerais</h3>
-        <div class="dash-kpi-grid">
-          <div class="dash-kpi-card">
-            <div class="dash-kpi-value">${conclusionRate}%</div>
-            <div class="dash-kpi-label">Taxa de conclusão</div>
-          </div>
-          <div class="dash-kpi-card">
-            <div class="dash-kpi-value">${overduePct}%</div>
-            <div class="dash-kpi-label">Tarefas em atraso (${overdue.length} de ${open.length})</div>
-          </div>
-          <div class="dash-kpi-card">
-            <div class="dash-kpi-value">${createdLast30.length} / ${completedLast30.length}</div>
-            <div class="dash-kpi-label">Criadas / Concluídas (30 dias)</div>
-          </div>
-          <div class="dash-kpi-card">
-            <div class="dash-kpi-value">${todayEvents.length}</div>
-            <div class="dash-kpi-label">Agenda(s) hoje</div>
-          </div>
-        </div>
-        ${catLoadList.length ? `
-        <div class="dash-catload-row">
-          ${catLoadList.map(x => `<span class="dash-catload-pill" style="background:${x.cat.color}22; color:${x.cat.color};"><span class="dot" style="background:${x.cat.color}"></span>${escapeHtml(x.cat.name)}: ${x.count}</span>`).join('')}
-        </div>` : ''}
-      </div>
-
-      <div class="dash-grid-2">
-        <div class="dash-section">
-          <div class="dash-strip-header">
-            <h3 class="dash-section-title" style="margin-bottom:0;">Notas recentes</h3>
-            <a href="#" class="dash-see-all-link" id="dashSeeAllNotesRecentLink">Ver todas →</a>
-          </div>
-          ${recentNotes.length ? `<div class="dash-notelist">
-            ${recentNotes.map(n => {
-              const cat = catById(n.categoryId);
-              return `<div class="dash-notelist-row" data-note-id="${n.id}">
-                <span class="dash-notelist-icon" style="background:var(--surface-2); color:var(--ink-faint);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></span>
-                <span class="dash-notelist-title">${escapeHtml(n.title||'Sem título')}</span>
-                ${cat ? `<span class="dash-notelist-cat" style="background:${cat.color}22; color:${cat.color};">${escapeHtml(cat.name)}</span>` : ''}
-                <span class="dash-notelist-time">Editada ${fmtEditedLabel(n.updatedAt||n.createdAt)}</span>
-              </div>`;
-            }).join('')}
-          </div>` : emptyDashState('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>', 'Nenhuma nota ainda.')}
         </div>
 
         <div class="dash-section">
@@ -5355,31 +5235,16 @@ function renderDashboard(){
       if(ev) openEventComposer(ev);
     };
   });
-  const seeAllNotesLink = document.getElementById('dashSeeAllNotesLink');
-  if(seeAllNotesLink) seeAllNotesLink.onclick = (e) => { e.preventDefault(); currentView = 'notes'; render(); };
-
-  const seeAllNotesRecentLink = document.getElementById('dashSeeAllNotesRecentLink');
-  if(seeAllNotesRecentLink) seeAllNotesRecentLink.onclick = (e) => { e.preventDefault(); currentView = 'notes'; render(); };
   const seeAllImportantLink = document.getElementById('dashSeeAllImportantLink');
   if(seeAllImportantLink) seeAllImportantLink.onclick = (e) => { e.preventDefault(); currentView = 'tasks'; render(); };
   const seeAllImportantBottomLink = document.getElementById('dashSeeAllImportantBottomLink');
   if(seeAllImportantBottomLink) seeAllImportantBottomLink.onclick = () => { currentView = 'tasks'; render(); };
-  view.querySelectorAll('.dash-notelist-row[data-note-id]').forEach(row => {
-    row.onclick = () => {
-      currentView = 'notes';
-      render();
-      const n = state.notes.find(x => x.id === row.dataset.noteId);
-      if(n) openNoteComposer(n);
-    };
-  });
   view.querySelectorAll('.dash-tasklist-row[data-task-id]').forEach(row => {
     row.onclick = () => { currentView = 'tasks'; activeTaskId = row.dataset.taskId; creatingNewTask = false; render(); };
   });
 
   const kpiEventsCard = document.getElementById('dashKpiEventsCard');
   if(kpiEventsCard) kpiEventsCard.onclick = () => { currentView = 'calendar'; render(); };
-  const kpiTagsCard = document.getElementById('dashKpiTagsCard');
-  if(kpiTagsCard) kpiTagsCard.onclick = () => { openSettingsView('tags'); };
   const kpiImportantCard = document.getElementById('dashKpiImportantCard');
   if(kpiImportantCard) kpiImportantCard.onclick = () => { currentView = 'tasks'; render(); };
 
