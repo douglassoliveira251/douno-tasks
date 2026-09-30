@@ -1,3 +1,13 @@
+## [1.10.085] - 2026-09-30 00:00
+
+### Fixed
+
+#### Tarefas
+
+- Recorrência desalinhava quando o prazo era editado antes de concluir a tarefa. Exemplo relatado: tarefa criada no dia 1 com recorrência semanal, reagendada pro dia 4 e concluída ali — a próxima ocorrência saía no dia 11 (dia 4 + 7) em vez de dia 8 (dia 1 + 7). A causa: o cálculo da próxima data usava o prazo atual da tarefa como base, que pode ser editado livremente pelo usuário pra planejar quando fazer aquela ocorrência específica. Agora usa sempre o campo "A partir de" (`recorrência` → data de início), que só muda se o usuário mexer nele de propósito — o prazo continua editável sem afetar a cadência. Esse campo já existia no popover de recorrência; só não era consultado no momento de gerar a próxima tarefa.
+
+
+
 ## [1.10.084] - 2026-09-29 00:00
 
 ### Changed
