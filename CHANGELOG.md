@@ -1,3 +1,13 @@
+## [1.10.089] - 2026-09-30 00:00
+
+### Added
+
+#### Configurações → Integrações
+
+- Nova conexão com o Outlook via login Microsoft (Graph API): agendas criadas ou editadas no Taskin agora podem virar eventos de verdade no Outlook — editáveis, com categoria, e que dá pra encaminhar. Diferente do link de assinatura (que é somente leitura e não permite isso no Outlook). Botão "Conectar Outlook" na aba Integrações; funciona só na direção Taskin → Outlook.
+
+
+
 ## [1.10.088] - 2026-09-30 00:00
 
 ### Added
