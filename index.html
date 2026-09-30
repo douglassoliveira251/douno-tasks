@@ -505,6 +505,16 @@
   .search-result-meta{font-size:11px; color:var(--ink-faint); flex-shrink:0; white-space:nowrap;}
   .search-results-empty{padding:18px 10px; text-align:center; font-size:12.5px; color:var(--ink-faint);}
 
+  .topbar-notif-wrap{position:relative;}
+  .notif-badge{
+    position:absolute; top:4px; right:4px; min-width:16px; height:16px; padding:0 4px;
+    border-radius:999px; background:var(--danger); color:#fff; font-size:10px; font-weight:700;
+    line-height:16px; text-align:center;
+  }
+  .notif-dropdown{left:auto; right:0; width:340px; max-width:90vw;}
+  .notif-dropdown-empty{padding:24px 10px; text-align:center; font-size:12.5px; color:var(--ink-faint);}
+  .search-result-row.notif-overdue .search-result-meta{color:var(--danger);}
+
   .save-error-badge{
     display:none; align-items:center; gap:6px; padding:0 14px; height:38px; flex-shrink:0;
     background:var(--danger-light); color:var(--danger); border:1px solid var(--danger);
@@ -1855,9 +1865,13 @@
         <button class="notification-btn" id="helpBtn" title="Ajuda">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4"/><path d="M12 17h.01"/></svg>
         </button>
-        <button class="notification-btn" id="notificationBtn" title="Notificações">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-        </button>
+        <div class="topbar-notif-wrap" id="topbarNotifWrap">
+          <button class="notification-btn" id="notificationBtn" title="Notificações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="notif-badge" id="notifBadge" style="display:none;"></span>
+          </button>
+          <div class="search-results-dropdown notif-dropdown" id="notifDropdown" style="display:none;"></div>
+        </div>
         <div class="topbar-avatar-wrap" id="topbarAvatarWrap">
           <button class="topbar-profile-chip" id="topbarAvatarBtn" title="Conta">
             <span class="profile-avatar" id="profileAvatarTopbar"></span>
@@ -5058,7 +5072,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.087';
+const APP_VERSION = '1.10.088';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -7570,6 +7584,78 @@ function renderSearchResultsDropdown(){
   });
   dd.style.display = 'block';
 }
+function computeNotifItems(){
+  const today = todayStr();
+  const overdueTasks = state.tasks.filter(t => !t.done && t.dueDate && t.dueDate < today)
+    .sort((a,b) => (a.dueDate||'').localeCompare(b.dueDate||''));
+  const todayTasks = state.tasks.filter(t => !t.done && t.dueDate === today);
+  const todayEvents = eventsInScope().filter(ev => ev.date === today)
+    .sort((a,b) => (a.startTime||'00:00').localeCompare(b.startTime||'00:00'));
+  return { overdueTasks, todayTasks, todayEvents };
+}
+function updateNotifBadge(){
+  const { overdueTasks, todayTasks, todayEvents } = computeNotifItems();
+  const count = overdueTasks.length + todayTasks.length + todayEvents.length;
+  const badge = document.getElementById('notifBadge');
+  if(!badge) return;
+  badge.textContent = count > 9 ? '9+' : String(count);
+  badge.style.display = count > 0 ? 'block' : 'none';
+}
+function renderNotifDropdown(){
+  const dd = document.getElementById('notifDropdown');
+  const { overdueTasks, todayTasks, todayEvents } = computeNotifItems();
+  if(!overdueTasks.length && !todayTasks.length && !todayEvents.length){
+    dd.innerHTML = `<div class="notif-dropdown-empty">Nenhuma pendência por aqui. 🎉</div>`;
+    dd.style.display = 'block';
+    return;
+  }
+  function group(label, items, iconKey, iconBg, iconColor, metaFn, extraClass){
+    if(!items.length) return '';
+    return `
+      <div class="search-results-group-label">${label}</div>
+      ${items.map(it => `
+        <div class="search-result-row ${extraClass||''}" data-kind="${iconKey}" data-id="${it.id}">
+          <span class="search-result-icon" style="background:${iconBg}; color:${iconColor};">${PAGE_HEADER_ICONS[iconKey]}</span>
+          <span class="search-result-title">${escapeHtml(it.title||'Sem título')}</span>
+          <span class="search-result-meta">${metaFn(it)}</span>
+        </div>
+      `).join('')}
+    `;
+  }
+  dd.innerHTML =
+    group('Atrasadas', overdueTasks, 'tasks', 'var(--danger-light)', 'var(--danger)', t => fmtDate(t.dueDate), 'notif-overdue') +
+    group('Tarefas de hoje', todayTasks, 'tasks', 'var(--primary-light)', 'var(--primary)', t => t.dueTime || '') +
+    group('Agenda de hoje', todayEvents, 'calendar', 'var(--priority-baixa-light)', 'var(--priority-baixa)', ev => ev.allDay ? '' : (ev.startTime||''));
+  dd.querySelectorAll('.search-result-row').forEach(row => {
+    row.onclick = () => {
+      const kind = row.dataset.kind;
+      const id = row.dataset.id;
+      closeNotifDropdown();
+      if(kind === 'tasks'){
+        currentView = 'tasks'; activeTaskId = id; creatingNewTask = false; render();
+      } else if(kind === 'calendar'){
+        const ev = state.events.find(x => x.id === id);
+        if(ev) openEventComposer(ev);
+      }
+    };
+  });
+  dd.style.display = 'block';
+}
+function closeNotifDropdown(){
+  const dd = document.getElementById('notifDropdown');
+  if(dd) dd.style.display = 'none';
+}
+document.getElementById('notificationBtn').onclick = (e) => {
+  e.stopPropagation();
+  const dd = document.getElementById('notifDropdown');
+  const isOpen = dd.style.display !== 'none';
+  closeSearchResultsDropdown();
+  if(isOpen){ closeNotifDropdown(); } else { renderNotifDropdown(); }
+};
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('topbarNotifWrap');
+  if(wrap && !wrap.contains(e.target)) closeNotifDropdown();
+});
 document.getElementById('searchInput').addEventListener('input', e => {
   searchTerm = e.target.value;
   updateSearchClearBtnVisibility();
@@ -7675,6 +7761,7 @@ function render(){
   }
   addBtn.classList.toggle('shifted', currentView === 'tasks' && (activeTaskId || creatingNewTask));
   renderProfileCard();
+  updateNotifBadge();
   if(document.getElementById('helpPanel').classList.contains('show')) renderHelpPanelContent();
   renderSidebarCats();
   if(currentView === 'dashboard') renderDashboard();

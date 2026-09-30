@@ -1,3 +1,13 @@
+## [1.10.088] - 2026-09-30 00:00
+
+### Added
+
+#### Topbar
+
+- O sino de notificações, que antes era só um ícone sem função, agora abre um painel com tarefas atrasadas, tarefas de hoje e agenda de hoje, com uma bolinha de contagem. Clicar num item leva direto pra ele.
+
+
+
 ## [1.10.087] - 2026-09-30 00:00
 
 ### Changed
