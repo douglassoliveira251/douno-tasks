@@ -1,3 +1,13 @@
+## [1.10.087] - 2026-09-30 00:00
+
+### Changed
+
+#### Configurações
+
+- Perfil: o campo de e-mail deixou de ser um texto livre desconectado da conta e passou a exibir o e-mail real de login, com opção de trocar (envia confirmação por e-mail). Adicionada opção de alterar a senha direto na tela, sem precisar do fluxo de "esqueci minha senha". Ambas exigem conta na nuvem conectada.
+
+
+
 ## [1.10.086] - 2026-09-30 00:00
 
 ### Added

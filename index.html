@@ -5058,7 +5058,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.086';
+const APP_VERSION = '1.10.087';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -6608,7 +6608,7 @@ function renderProfilePanel(panel){
   tempAvatarData = state.profile.avatar || null;
   panel.innerHTML = `
     <h3 class="settings-section-title">Perfil</h3>
-    <p class="settings-section-desc">Sua foto, nome e e-mail exibidos na barra lateral.</p>
+    <p class="settings-section-desc">Sua foto e nome exibidos na barra lateral.</p>
     <div class="profile-form">
       <label>Foto de perfil</label>
       <div class="avatar-picker">
@@ -6620,16 +6620,49 @@ function renderProfilePanel(panel){
       </div>
       <label>Nome</label>
       <input type="text" id="profileNameInput" placeholder="Seu nome">
-      <label>E-mail</label>
-      <input type="email" id="profileEmailInput" placeholder="seu@email.com">
       <div style="margin-top:16px; display:flex; align-items:center; gap:10px;">
         <button class="btn small" id="saveProfileBtn">Salvar perfil</button>
         <span id="profileSaveHint" style="font-size:12px; color:var(--primary-dark);"></span>
       </div>
     </div>
+
+    <h3 class="settings-section-title" style="margin-top:28px;">Conta</h3>
+    ${!cloudSession ? `
+      <p class="settings-section-desc">Conecte-se com uma conta na nuvem para gerenciar o e-mail e a senha de login.</p>
+    ` : `
+      <p class="settings-section-desc">E-mail e senha usados para entrar no Taskin.</p>
+      <div class="tp-field" style="max-width:360px;">
+        <label class="tp-label">E-mail de login</label>
+        <div style="display:flex; gap:8px;">
+          <input type="email" class="tp-input" id="accountEmailDisplay" readonly value="${escapeHtml(cloudSession.user.email||'')}" style="flex:1;">
+          <button class="btn ghost small" id="changeEmailToggleBtn" style="white-space:nowrap;">Alterar</button>
+        </div>
+        <div id="changeEmailForm" style="display:none; margin-top:10px;">
+          <label class="tp-label">Novo e-mail</label>
+          <input type="email" class="tp-input" id="newEmailInput" placeholder="novo@email.com">
+          <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+            <button class="btn small" id="confirmChangeEmailBtn">Confirmar</button>
+            <span id="changeEmailHint" style="font-size:12px;"></span>
+          </div>
+        </div>
+      </div>
+      <div class="tp-field" style="max-width:360px; margin-top:18px;">
+        <label class="tp-label">Senha</label>
+        <div><button class="btn ghost small" id="changePasswordToggleBtn">Alterar senha</button></div>
+        <div id="changePasswordForm" style="display:none; margin-top:10px;">
+          <label class="tp-label">Nova senha</label>
+          <input type="password" class="tp-input" id="newPasswordInput" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+          <label class="tp-label" style="margin-top:8px;">Confirmar nova senha</label>
+          <input type="password" class="tp-input" id="confirmPasswordInput" placeholder="Repita a nova senha" autocomplete="new-password">
+          <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+            <button class="btn small" id="confirmChangePasswordBtn">Salvar nova senha</button>
+            <span id="changePasswordHint" style="font-size:12px;"></span>
+          </div>
+        </div>
+      </div>
+    `}
   `;
   document.getElementById('profileNameInput').value = state.profile.name || '';
-  document.getElementById('profileEmailInput').value = state.profile.email || '';
   document.getElementById('avatarPreview').innerHTML = avatarInnerHtml({ name: state.profile.name, avatar: tempAvatarData });
 
   document.getElementById('pickPhotoBtn').onclick = () => document.getElementById('photoInput').click();
@@ -6643,11 +6676,58 @@ function renderProfilePanel(panel){
   });
   document.getElementById('saveProfileBtn').onclick = () => {
     state.profile.name = document.getElementById('profileNameInput').value.trim();
-    state.profile.email = document.getElementById('profileEmailInput').value.trim();
     state.profile.avatar = tempAvatarData;
     markDirty();
     const hint = document.getElementById('profileSaveHint');
     if(hint){ hint.textContent = 'Salvo!'; setTimeout(() => { if(hint) hint.textContent = ''; }, 1500); }
+  };
+
+  if(!cloudSession) return;
+
+  const changeEmailForm = document.getElementById('changeEmailForm');
+  document.getElementById('changeEmailToggleBtn').onclick = () => {
+    changeEmailForm.style.display = changeEmailForm.style.display === 'none' ? 'block' : 'none';
+  };
+  document.getElementById('confirmChangeEmailBtn').onclick = async () => {
+    const newEmail = document.getElementById('newEmailInput').value.trim();
+    const hint = document.getElementById('changeEmailHint');
+    if(!newEmail){ hint.style.color = 'var(--danger)'; hint.textContent = 'Digite o novo e-mail.'; return; }
+    hint.style.color = 'var(--ink-soft)'; hint.textContent = 'Enviando...';
+    try{
+      const { error } = await sbClient.auth.updateUser({ email: newEmail });
+      if(error) throw error;
+      hint.style.color = 'var(--primary-dark)';
+      hint.textContent = 'Verifique seu e-mail para confirmar a troca.';
+    }catch(e){
+      console.error(e);
+      hint.style.color = 'var(--danger)';
+      hint.textContent = 'Não foi possível trocar o e-mail agora.';
+    }
+  };
+
+  const changePasswordForm = document.getElementById('changePasswordForm');
+  document.getElementById('changePasswordToggleBtn').onclick = () => {
+    changePasswordForm.style.display = changePasswordForm.style.display === 'none' ? 'block' : 'none';
+  };
+  document.getElementById('confirmChangePasswordBtn').onclick = async () => {
+    const pw1 = document.getElementById('newPasswordInput').value;
+    const pw2 = document.getElementById('confirmPasswordInput').value;
+    const hint = document.getElementById('changePasswordHint');
+    if(pw1.length < 6){ hint.style.color = 'var(--danger)'; hint.textContent = 'A senha precisa ter ao menos 6 caracteres.'; return; }
+    if(pw1 !== pw2){ hint.style.color = 'var(--danger)'; hint.textContent = 'As senhas não coincidem.'; return; }
+    hint.style.color = 'var(--ink-soft)'; hint.textContent = 'Salvando...';
+    try{
+      const { error } = await sbClient.auth.updateUser({ password: pw1 });
+      if(error) throw error;
+      hint.style.color = 'var(--primary-dark)';
+      hint.textContent = 'Senha alterada!';
+      document.getElementById('newPasswordInput').value = '';
+      document.getElementById('confirmPasswordInput').value = '';
+    }catch(e){
+      console.error(e);
+      hint.style.color = 'var(--danger)';
+      hint.textContent = 'Não foi possível alterar a senha agora.';
+    }
   };
 }
 
@@ -7086,6 +7166,9 @@ async function startCloudSession(){
   try{
     await loadStateFromCloud();
   }catch(e){ console.error('Erro ao carregar dados da nuvem', e); }
+  if(cloudSession.user.email && state.profile.email !== cloudSession.user.email){
+    state.profile.email = cloudSession.user.email;
+  }
   applyTheme();
   if(state.defaultCategoryFilter) activeCategoryFilter = state.defaultCategoryFilter;
   if(state.calendarViewDefault) calendarView = state.calendarViewDefault;
