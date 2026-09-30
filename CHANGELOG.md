@@ -1,3 +1,13 @@
+## [1.10.090] - 2026-09-30 00:00
+
+### Fixed
+
+#### Configurações → Integrações
+
+- Conexão com o Outlook falhava com erro "redirect_uri is not valid": o endereço de retorno usado no login era calculado a partir da URL atual da página (`window.location`), que podia não bater exatamente com o cadastrado no Azure (ex: abrir como `/Taskin/index.html` em vez de `/Taskin/`). Agora o endereço é fixo no código, igual ao cadastrado no Azure.
+
+
+
 ## [1.10.089] - 2026-09-30 00:00
 
 ### Added
