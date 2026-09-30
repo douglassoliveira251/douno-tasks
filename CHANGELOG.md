@@ -1,3 +1,13 @@
+## [1.10.086] - 2026-09-30 00:00
+
+### Added
+
+#### Configurações
+
+- Nova aba "Integrações": gera um link de assinatura (`.ics` via Supabase Edge Function) para trazer as agendas do Taskin para outros calendários, como o Outlook.com ou o Google Agenda, sem precisar de login OAuth. É só colar o link em "Assinar da web" no calendário externo. Funciona só na direção Taskin → calendário externo (o que for criado direto no calendário externo não volta pro Taskin), e a sincronização depende do intervalo de atualização que cada serviço usa pra calendários assinados por link (não é instantâneo). Disponível apenas com a conta na nuvem conectada, já que o link depende dos dados estarem no servidor. Inclui botão para gerar um novo link e invalidar o anterior.
+
+
+
 ## [1.10.085] - 2026-09-30 00:00
 
 ### Fixed

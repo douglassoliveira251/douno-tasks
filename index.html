@@ -5058,7 +5058,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.085';
+const APP_VERSION = '1.10.086';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -6450,8 +6450,9 @@ const SETTINGS_NAV_ICONS = {
   categorias: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>',
   tags: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41L11 3.83A2 2 0 009.59 3.24H4a1 1 0 00-1 1v5.59a2 2 0 00.59 1.41l9.58 9.58a2 2 0 002.82 0l5.6-5.59a2 2 0 000-2.82z"/><circle cx="7" cy="7" r="1.3" fill="currentColor" stroke="none"/></svg>',
   arquivo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>',
+  integracoes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/></svg>',
 };
-const SETTINGS_NAV_LABELS = { perfil:'Perfil', personalizacao:'Personalização', categorias:'Espaços', tags:'Tags', arquivo:'Arquivo' };
+const SETTINGS_NAV_LABELS = { perfil:'Perfil', personalizacao:'Personalização', categorias:'Espaços', tags:'Tags', arquivo:'Arquivo', integracoes:'Integrações' };
 function renderSettingsView(){
   const view = document.getElementById('settingsView');
   view.innerHTML = `
@@ -6473,6 +6474,7 @@ function renderSettingsView(){
   else if(settingsTab === 'tags') renderTagsPanel(panel);
   else if(settingsTab === 'arquivo') renderFilePanel(panel);
   else if(settingsTab === 'personalizacao') renderPersonalizationPanel(panel);
+  else if(settingsTab === 'integracoes') renderIntegrationsPanel(panel);
   else renderProfilePanel(panel);
 }
 
@@ -6526,6 +6528,80 @@ function renderFilePanel(panel){
   document.getElementById('saveAsFileBtnSettings').onclick = saveFileAs;
   document.getElementById('saveFileBtnSettings').onclick = saveFile;
   updateFileStatus();
+}
+
+const ICS_FEED_BASE_URL = SUPABASE_URL + '/functions/v1/ics-feed';
+function generateIcsToken(){
+  const bytes = new Uint8Array(20);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+async function fetchIcsToken(){
+  if(!sbClient || !cloudSession) return null;
+  const { data, error } = await sbClient.from('taskin_state').select('ics_token').eq('user_id', cloudSession.user.id).maybeSingle();
+  if(error){ console.error(error); return null; }
+  return data ? data.ics_token : null;
+}
+async function regenerateIcsToken(){
+  if(!sbClient || !cloudSession) return null;
+  const token = generateIcsToken();
+  const { error } = await sbClient.from('taskin_state').update({ ics_token: token }).eq('user_id', cloudSession.user.id);
+  if(error) throw error;
+  return token;
+}
+function renderIntegrationsPanel(panel){
+  panel.innerHTML = `
+    <h3 class="settings-section-title">Integrações</h3>
+    <p class="settings-section-desc">Assine sua agenda do Taskin em outro calendário, como o Outlook ou o Google Agenda. As agendas criadas ou editadas no Taskin aparecem lá automaticamente; o caminho inverso não é suportado.</p>
+    ${!cloudSession ? `
+      <p class="settings-section-desc" style="margin-top:14px;"><strong>Disponível apenas com a conta na nuvem conectada.</strong> Entre com sua conta em Perfil para gerar o link de assinatura.</p>
+    ` : `
+      <div class="tp-field" style="max-width:520px;">
+        <label class="tp-label">Link de assinatura (somente leitura)</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" class="tp-input" id="icsFeedUrlInput" readonly value="Gerando..." style="flex:1; font-size:12px;">
+          <button class="btn ghost small" id="copyIcsLinkBtn" style="white-space:nowrap;">Copiar</button>
+        </div>
+      </div>
+      <p class="settings-section-desc" style="margin-top:10px;">
+        No Outlook.com: <strong>Configurações → Calendário → Adicionar calendário → Assinar da web</strong>, cole o link acima. A sincronização não é instantânea — o Outlook atualiza calendários assinados a cada algumas horas.
+      </p>
+      <button class="btn ghost small" id="regenIcsLinkBtn" style="margin-top:6px;">Gerar novo link</button>
+      <p class="settings-section-desc" style="margin-top:6px;">Gerar um novo link invalida o anterior — use se achar que alguém mais teve acesso a ele.</p>
+    `}
+  `;
+  if(!cloudSession) return;
+  const urlInput = panel.querySelector('#icsFeedUrlInput');
+  const applyToken = (token) => {
+    urlInput.value = token ? `${ICS_FEED_BASE_URL}?token=${token}` : '';
+  };
+  (async () => {
+    let token = await fetchIcsToken();
+    if(!token){
+      try{ token = await regenerateIcsToken(); }catch(e){ console.error(e); }
+    }
+    applyToken(token);
+  })();
+  panel.querySelector('#copyIcsLinkBtn').onclick = (e) => {
+    urlInput.select();
+    navigator.clipboard.writeText(urlInput.value).then(() => {
+      const btn = e.currentTarget;
+      const original = btn.textContent;
+      btn.textContent = 'Copiado!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }).catch(() => {});
+  };
+  panel.querySelector('#regenIcsLinkBtn').onclick = async () => {
+    urlInput.value = 'Gerando...';
+    try{
+      const token = await regenerateIcsToken();
+      applyToken(token);
+    }catch(e){
+      console.error(e);
+      urlInput.value = '';
+      urlInput.placeholder = 'Falha ao gerar o link. Tente novamente.';
+    }
+  };
 }
 
 function renderProfilePanel(panel){
