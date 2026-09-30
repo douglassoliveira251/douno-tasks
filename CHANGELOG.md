@@ -1,3 +1,27 @@
+## [1.10.091] - 2026-09-30 00:00
+
+### Fixed
+
+#### Notas
+
+- Editor: selecionar várias linhas com Título 3 (ou 1/2) aplicado e clicar em "Limpar formatação" não fazia nada. O navegador funde uma seleção multi-linha formatada como título num único bloco `<h3>` com quebras de linha internas, e o `removeFormat` nativo não desfaz títulos — só formatação de texto (negrito/itálico/sublinhado). Corrigido tratando esse caso separadamente.
+
+### Changed
+
+#### Geral
+
+- Renomeado "Taskin" para "DOUNO Tasks" em todo o sistema (título da aba, textos de configurações, nome sugerido do arquivo de dados — `douno-tasks.json` — e nos metadados dos convites de calendário exportados).
+
+#### Configurações → Perfil
+
+- Acesso à nuvem restrito a uma lista de e-mails permitidos, já que o projeto de autenticação é compartilhado com outro app (Dolfin). Uma conta válida nesse projeto mas fora da lista agora é bloqueada no login com um aviso, mesmo já tendo sessão salva no navegador. Os dados de cada conta já eram isolados por política de RLS no banco — essa mudança impede o uso do sistema em si, não só a leitura de dados de terceiros.
+
+#### Integrações (e-mail e calendário)
+
+- Remetente do resumo diário trocado para `tasks@douno.com.br` (domínio próprio).
+
+
+
 ## [1.10.090] - 2026-09-30 00:00
 
 ### Fixed

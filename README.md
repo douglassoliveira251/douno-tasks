@@ -1,8 +1,8 @@
-# Taskin
+# DOUNO Tasks
 
 Organize no seu ritmo.
 
-Taskin é um sistema pessoal de produtividade — tarefas, notas, calendário e um dashboard com indicadores — construído como uma aplicação **single-file HTML/CSS/JS**, sem backend, sem build step e sem dependências externas de servidor. Todos os seus dados ficam com você.
+DOUNO Tasks é um sistema pessoal de produtividade — tarefas, notas, calendário e um dashboard com indicadores — construído como uma aplicação **single-file HTML/CSS/JS**, sem backend, sem build step e sem dependências externas de servidor. Todos os seus dados ficam com você.
 
 ## ✨ Recursos
 
@@ -17,7 +17,7 @@ Taskin é um sistema pessoal de produtividade — tarefas, notas, calendário e 
 
 ## 💾 Como os dados são salvos
 
-Taskin não tem servidor nem banco de dados externo. Os dados ficam num único arquivo `.json` local, salvo através da **File System Access API** (Chrome/Edge), com:
+DOUNO Tasks não tem servidor nem banco de dados externo. Os dados ficam num único arquivo `.json` local, salvo através da **File System Access API** (Chrome/Edge), com:
 
 - Reconexão automática ao arquivo entre sessões (via handle salvo no IndexedDB do navegador).
 - Fallback para `localStorage` em navegadores sem suporte à File System Access API.

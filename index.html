@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='92' fill='%23151B28'/%3E%3Cpath d='M112 152H292 C364 152 408 192 408 256 C408 320 364 360 292 360 H112 V300' stroke='%23ffffff' stroke-width='56' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
-<title>Taskin</title>
+<title>DOUNO Tasks</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -2033,6 +2033,14 @@ const sbClient = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY)
   : null;
 let cloudSession = null;
 
+/* O projeto Supabase de autenticação é compartilhado com outro app (Dolfin) —
+   por isso essa lista restringe quem pode efetivamente usar o DOUNO Tasks,
+   mesmo tendo uma conta válida nesse mesmo projeto. */
+const ALLOWED_EMAILS = ['douglas.soliveira+dolfin@outlook.com.br'];
+function isEmailAllowed(email){
+  return !!email && ALLOWED_EMAILS.includes(String(email).trim().toLowerCase());
+}
+
 /* ===================== OUTLOOK (Microsoft Graph) ===================== */
 const OUTLOOK_CLIENT_ID = '553b6f2f-ee51-494a-8b3a-35aeab00c172';
 const OUTLOOK_REDIRECT_URI = 'https://douglassoliveira251.github.io/Taskin/';
@@ -2588,7 +2596,7 @@ function updateFileStatus(){
     if(dotSettings){ dotSettings.className = cloudWriteFailed ? 'status-dot dirty' : cls; dotSettings.title = cloudWriteFailed ? 'Falha ao salvar na nuvem — tentando de novo' : title; }
     if(textSettings) textSettings.textContent = `${cloudSession.user.email} (nuvem)`;
   } else if(fileHandle){
-    const name = fileHandle.name || 'taskin.json';
+    const name = fileHandle.name || 'douno-tasks.json';
     if(dotSettings){ dotSettings.className = cls; dotSettings.title = title; }
     if(textSettings) textSettings.textContent = name;
   } else {
@@ -2601,8 +2609,8 @@ async function saveFileAs(){
   if(!window.showSaveFilePicker){ downloadFallback(); return; }
   try{
     const handle = await window.showSaveFilePicker({
-      suggestedName: 'taskin.json',
-      types: [{ description: 'Taskin JSON', accept: {'application/json': ['.json']} }]
+      suggestedName: 'douno-tasks.json',
+      types: [{ description: 'DOUNO Tasks JSON', accept: {'application/json': ['.json']} }]
     });
     fileHandle = handle;
     await writeStateToFile();
@@ -2615,12 +2623,12 @@ async function saveFileAs(){
 
 async function openFile(){
   if(!window.showOpenFilePicker){
-    alert('Seu navegador não suporta a File System Access API. Use Chrome ou Edge para abrir/salvar o taskin.json diretamente. Enquanto isso, os dados continuam salvos no navegador.');
+    alert('Seu navegador não suporta a File System Access API. Use Chrome ou Edge para abrir/salvar o douno-tasks.json diretamente. Enquanto isso, os dados continuam salvos no navegador.');
     return;
   }
   try{
     const [handle] = await window.showOpenFilePicker({
-      types: [{ description: 'Taskin JSON', accept: {'application/json': ['.json']} }]
+      types: [{ description: 'DOUNO Tasks JSON', accept: {'application/json': ['.json']} }]
     });
     const file = await handle.getFile();
     const text = await file.text();
@@ -2637,7 +2645,7 @@ async function openFile(){
       updateFileStatus();
       render();
     } else {
-      alert('Arquivo inválido para o Taskin.');
+      alert('Arquivo inválido para o DOUNO Tasks.');
     }
   }catch(e){
     if(e.name !== 'AbortError') console.error(e);
@@ -2652,8 +2660,8 @@ async function saveFile(){
   try{
     if(!fileHandle){
       fileHandle = await window.showSaveFilePicker({
-        suggestedName: 'taskin.json',
-        types: [{ description: 'Taskin JSON', accept: {'application/json': ['.json']} }]
+        suggestedName: 'douno-tasks.json',
+        types: [{ description: 'DOUNO Tasks JSON', accept: {'application/json': ['.json']} }]
       });
       await idbSetHandle('main', fileHandle);
       localStorage.removeItem('tyvraSkipFileLink');
@@ -2672,7 +2680,7 @@ function downloadFallback(){
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'taskin.json'; a.click();
+  a.href = url; a.download = 'douno-tasks.json'; a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -4546,6 +4554,21 @@ function clearFormattingInSelection(targetEl){
     // que divide corretamente as tags inline (negrito/itálico/sublinhado) nos
     // limites exatos da seleção, sem afetar o restante do parágrafo.
     try{ document.execCommand('removeFormat', false, null); }catch(e){}
+    // removeFormat não desfaz título (H1/H2/H3) — o bloco pode conter várias
+    // linhas (separadas por <br>) quando o formatBlock do navegador funde uma
+    // seleção multi-linha num único título. Troca a tag do bloco por uma div
+    // comum preservando o conteúdo inteiro (título é propriedade do bloco
+    // todo, não de parte dele — igual já vale pra aplicar um título).
+    if(startTop.nodeType === 1 && /^(H1|H2|H3)$/.test(startTop.tagName)){
+      const div = document.createElement('div');
+      div.innerHTML = startTop.innerHTML;
+      startTop.parentNode.replaceChild(div, startTop);
+      const newRange = document.createRange();
+      newRange.selectNodeContents(div);
+      newRange.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    }
     return;
   }
 
@@ -5220,7 +5243,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.090';
+const APP_VERSION = '1.10.091';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -5901,7 +5924,7 @@ function downloadEventAsICS(ev){
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Taskin//PT-BR',
+    'PRODID:-//DOUNO Tasks//PT-BR',
     'CALSCALE:GREGORIAN',
     'BEGIN:VEVENT',
     'UID:' + ev.id + '@taskin',
@@ -6679,9 +6702,9 @@ function renderPersonalizationPanel(panel){
 function renderFilePanel(panel){
   panel.innerHTML = `
     <h3 class="settings-section-title">Arquivo base</h3>
-    <p class="settings-section-desc">Abra, salve ou troque o arquivo <code>taskin.json</code> usado para guardar seus dados.</p>
+    <p class="settings-section-desc">Abra, salve ou troque o arquivo <code>douno-tasks.json</code> usado para guardar seus dados.</p>
     <div class="file-bar-name" style="margin-bottom:16px; font-size:13px;">
-      <span class="status-dot" id="statusDotSettings"></span><span id="statusTextSettings">taskin.json</span>
+      <span class="status-dot" id="statusDotSettings"></span><span id="statusTextSettings">douno-tasks.json</span>
     </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <button class="file-bar-btn" id="openFileBtnSettings">Abrir arquivo</button>
@@ -6717,10 +6740,10 @@ async function regenerateIcsToken(){
 function renderIntegrationsPanel(panel){
   panel.innerHTML = `
     <h3 class="settings-section-title">Integrações</h3>
-    <p class="settings-section-desc">Leve suas agendas do Taskin para outros calendários.</p>
+    <p class="settings-section-desc">Leve suas agendas do DOUNO Tasks para outros calendários.</p>
 
     <h3 class="settings-section-title" style="margin-top:24px;">Outlook (Microsoft)</h3>
-    <p class="settings-section-desc">Conecte sua conta Microsoft pessoal para que as agendas do Taskin virem eventos de verdade no seu Outlook — editáveis, com categoria, e que você pode encaminhar. Só nessa direção (Taskin → Outlook).</p>
+    <p class="settings-section-desc">Conecte sua conta Microsoft pessoal para que as agendas do DOUNO Tasks virem eventos de verdade no seu Outlook — editáveis, com categoria, e que você pode encaminhar. Só nessa direção (DOUNO Tasks → Outlook).</p>
     <div id="outlookStatusRow" style="display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap;"></div>
     <p id="outlookHint" style="font-size:12px; margin-top:8px;"></p>
 
@@ -6804,7 +6827,7 @@ function renderProfilePanel(panel){
     ${!cloudSession ? `
       <p class="settings-section-desc">Conecte-se com uma conta na nuvem para gerenciar o e-mail e a senha de login.</p>
     ` : `
-      <p class="settings-section-desc">E-mail e senha usados para entrar no Taskin.</p>
+      <p class="settings-section-desc">E-mail e senha usados para entrar no DOUNO Tasks.</p>
       <div class="tp-field" style="max-width:360px;">
         <label class="tp-label">E-mail de login</label>
         <div style="display:flex; gap:8px;">
@@ -7247,8 +7270,8 @@ function renderLinkModal(mode, storedHandle, forced){
   if(mode === 'reconnect'){
     body.innerHTML = `
       <h3>Reconectar arquivo base</h3>
-      <p class="link-desc">Encontramos um vínculo anterior com <strong>taskin.json</strong>. Reconecte para continuar sincronizando suas tarefas e notas com esse arquivo.</p>
-      <button class="link-option primary" id="btnReconnect"><span class="icon">🔗</span><span class="txt"><strong>Reconectar taskin.json</strong><span>Concede permissão novamente ao arquivo já vinculado</span></span></button>
+      <p class="link-desc">Encontramos um vínculo anterior com <strong>douno-tasks.json</strong>. Reconecte para continuar sincronizando suas tarefas e notas com esse arquivo.</p>
+      <button class="link-option primary" id="btnReconnect"><span class="icon">🔗</span><span class="txt"><strong>Reconectar douno-tasks.json</strong><span>Concede permissão novamente ao arquivo já vinculado</span></span></button>
       <button class="link-option" id="btnLinkNewInstead"><span class="icon">📂</span><span class="txt"><strong>Vincular outro arquivo</strong><span>Escolher ou criar um arquivo diferente</span></span></button>
       ${forced ? '' : '<button class="link-skip" id="btnSkipLink">Continuar sem conectar (usar apenas este navegador)</button>'}
     `;
@@ -7258,9 +7281,9 @@ function renderLinkModal(mode, storedHandle, forced){
   } else {
     body.innerHTML = `
       <h3>${forced ? 'Conecte um arquivo para continuar' : 'Vincular arquivo base'}</h3>
-      <p class="link-desc">${forced ? 'O sistema fica indisponível sem um arquivo base conectado. Abra um <strong>taskin.json</strong> existente ou crie um novo para continuar.' : 'O Taskin ainda não está vinculado a um arquivo local. Vincule um <strong>taskin.json</strong> para manter tarefas, notas e perfil salvos e sincronizados entre sessões.'}</p>
-      <button class="link-option primary" id="btnOpenExisting"><span class="icon">📂</span><span class="txt"><strong>Abrir arquivo existente</strong><span>Já tenho um taskin.json salvo</span></span></button>
-      <button class="link-option" id="btnCreateNew"><span class="icon">🆕</span><span class="txt"><strong>Criar novo arquivo</strong><span>Começar do zero e salvar um novo taskin.json</span></span></button>
+      <p class="link-desc">${forced ? 'O sistema fica indisponível sem um arquivo base conectado. Abra um <strong>douno-tasks.json</strong> existente ou crie um novo para continuar.' : 'O DOUNO Tasks ainda não está vinculado a um arquivo local. Vincule um <strong>douno-tasks.json</strong> para manter tarefas, notas e perfil salvos e sincronizados entre sessões.'}</p>
+      <button class="link-option primary" id="btnOpenExisting"><span class="icon">📂</span><span class="txt"><strong>Abrir arquivo existente</strong><span>Já tenho um douno-tasks.json salvo</span></span></button>
+      <button class="link-option" id="btnCreateNew"><span class="icon">🆕</span><span class="txt"><strong>Criar novo arquivo</strong><span>Começar do zero e salvar um novo douno-tasks.json</span></span></button>
       ${forced ? '' : '<button class="link-skip" id="btnSkipLink">Continuar sem conectar (usar apenas este navegador)</button>'}
     `;
     document.getElementById('btnOpenExisting').onclick = linkOpenExisting;
@@ -7414,6 +7437,11 @@ function renderLoginGate(errorMsg){
     try{
       const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
       if(error) throw error;
+      if(!isEmailAllowed(data.session.user.email)){
+        await sbClient.auth.signOut();
+        renderLoginGate('Esta conta não tem acesso ao DOUNO Tasks.');
+        return;
+      }
       cloudSession = data.session;
       await startCloudSession();
     }catch(err){
@@ -7442,12 +7470,12 @@ function closeLoginGate(){
 async function linkOpenExisting(){
   try{
     const [handle] = await window.showOpenFilePicker({
-      types: [{ description: 'Taskin JSON', accept: {'application/json': ['.json']} }]
+      types: [{ description: 'DOUNO Tasks JSON', accept: {'application/json': ['.json']} }]
     });
     const file = await handle.getFile();
     const text = await file.text();
     const parsed = JSON.parse(text);
-    if(!(parsed && parsed.categories)){ alert('Arquivo inválido para o Taskin.'); return; }
+    if(!(parsed && parsed.categories)){ alert('Arquivo inválido para o DOUNO Tasks.'); return; }
     state = parsed;
     normalizeState();
     applyTheme();
@@ -7465,8 +7493,8 @@ async function linkOpenExisting(){
 async function linkCreateNew(){
   try{
     const handle = await window.showSaveFilePicker({
-      suggestedName: 'taskin.json',
-      types: [{ description: 'Taskin JSON', accept: {'application/json': ['.json']} }]
+      suggestedName: 'douno-tasks.json',
+      types: [{ description: 'DOUNO Tasks JSON', accept: {'application/json': ['.json']} }]
     });
     fileHandle = handle;
     await writeStateToFile();
@@ -7943,6 +7971,13 @@ async function boot(){
     try{
       const { data } = await sbClient.auth.getSession();
       if(data && data.session){
+        if(!isEmailAllowed(data.session.user.email)){
+          await sbClient.auth.signOut();
+          render();
+          renderLoginGate('Esta conta não tem acesso ao DOUNO Tasks.');
+          document.getElementById('loginOverlay').classList.add('show');
+          return;
+        }
         cloudSession = data.session;
         await startCloudSession();
         return;
