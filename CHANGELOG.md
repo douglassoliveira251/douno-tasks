@@ -1,3 +1,13 @@
+## [1.10.083] - 2026-09-29 00:00
+
+### Changed
+
+#### Configurações
+
+- Redesenhada a navegação da tela: as abas horizontais (Perfil, Personalização, Espaços, Tags, Arquivo) viraram uma lista lateral com ícones, à esquerda do conteúdo — mesmo padrão de configurações do macOS/Linear. Em telas estreitas (mobile), a lista vira uma fileira de pílulas que quebra linha em vez de ficar comprimida.
+
+
+
 ## [1.10.082] - 2026-09-29 00:00
 
 ### Fixed
