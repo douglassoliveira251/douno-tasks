@@ -1,3 +1,13 @@
+## [1.10.092] - 2026-09-30 00:00
+
+### Changed
+
+#### Integrações
+
+- Endereço de retorno do login com o Outlook trocado do domínio do GitHub Pages para o domínio próprio `https://tasks.douno.com.br/`, agora com SSL ativo.
+
+
+
 ## [1.10.091] - 2026-09-30 00:00
 
 ### Fixed
