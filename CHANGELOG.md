@@ -1,3 +1,13 @@
+## [1.10.084] - 2026-09-29 00:00
+
+### Changed
+
+#### Modo escuro
+
+- Paleta do modo escuro unificada com a do menu lateral (que é sempre escuro, com cores fixas): o verde de destaque e os tons neutros de fundo do conteúdo agora são exatamente os mesmos do menu. Antes, o conteúdo usava um verde mais apagado e um cinza neutro, diferentes do verde vivo e do cinza azulado do menu — a diferença só aparecia no modo escuro (no claro o menu contrasta de propósito) e dava a impressão de duas telas coladas. Opção 2 dos mockups apresentados, escolhida pelo usuário.
+
+
+
 ## [1.10.083] - 2026-09-29 00:00
 
 ### Changed

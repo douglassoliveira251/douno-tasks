@@ -42,16 +42,21 @@
     --font-mono:'JetBrains Mono',monospace;
   }
   [data-theme="dark"]{
-    --bg:#15171C;
-    --surface:#1E2127;
-    --surface-2:#282C34;
+    /* Paleta neutra e verde iguais aos do menu lateral (que é sempre escuro,
+       com essas mesmas cores fixas) — antes o conteúdo usava um cinza neutro
+       e um verde mais apagado, diferentes dos do menu, e a costura entre os
+       dois ficava visível no modo escuro (no claro isso não incomoda, já que
+       o menu escuro contrasta de propósito com o conteúdo claro). */
+    --bg:#151B28;
+    --surface:#1B2333;
+    --surface-2:#212939;
     --ink:#E9EAEE;
     --ink-soft:#A6ACB8;
     --ink-faint:#6B7280;
-    --border:#34383F;
-    --primary:#3FA087;
-    --primary-dark:#8FD9BF;
-    --primary-light:#1B332C;
+    --border:#2A3143;
+    --primary:#10B981;
+    --primary-dark:#6EE7B7;
+    --primary-light:#12271F;
     --accent:#EFBD5C;
     --accent-light:#332812;
     --danger:#E2685C;
@@ -5042,7 +5047,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.083';
+const APP_VERSION = '1.10.084';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
