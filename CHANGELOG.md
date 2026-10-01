@@ -1,3 +1,13 @@
+## [1.10.097] - 2026-10-01 00:00
+
+### Changed
+
+#### Modo escuro
+
+- Paleta escurecida: fundo quase preto (antes era um azul-acinzentado), cards com mais contraste e definição — baseado numa referência visual trazida pelo usuário. Sidebar e conteúdo continuam com a mesma paleta (unificados).
+
+
+
 ## [1.10.096] - 2026-10-01 00:00
 
 ### Fixed
