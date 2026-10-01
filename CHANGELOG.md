@@ -1,3 +1,19 @@
+## [1.10.095] - 2026-10-01 00:00
+
+### Added
+
+#### Tarefas
+
+- Anexos: agora dá pra anexar arquivos (qualquer tipo, não só imagem) direto na tarefa, igual já existia nas Notas. Imagens mostram miniatura; outros arquivos (PDF, planilha, etc.) mostram um ícone genérico — clicar abre o arquivo numa aba nova. Limite de 4 MB por arquivo, já que fica guardado junto com o resto dos dados (sem servidor de arquivo próprio).
+
+### Fixed
+
+#### Automação
+
+- Corrigido o agendamento do resumo diário por e-mail, que não disparava — o SQL do `cron.schedule` usava `extensions.net.http_post` (erro de minha parte), quando a função correta é `net.http_post`.
+
+
+
 ## [1.10.094] - 2026-10-01 00:00
 
 ### Changed
