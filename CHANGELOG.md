@@ -1,3 +1,13 @@
+## [1.10.094] - 2026-10-01 00:00
+
+### Changed
+
+#### Integrações → Outlook
+
+- Reescrita a integração com o Outlook: o token de acesso deixou de ficar só no navegador (MSAL.js) e passou a ser gerenciado do lado do servidor, em funções na Vercel (`/api/outlook/*`), guardado no Supabase (tabela nova `outlook_tokens`, sem acesso de cliente). Resolve dois problemas: a sessão não depende mais de qual domínio você está usando (antes, cada domínio tinha seu próprio login salvo, parecendo "desconectar toda hora" ao trocar de endereço), e a renovação do token agora é automática via refresh token no servidor, sem popup. O app de Azure precisou virar "confidencial" (com client secret) em vez de público.
+
+
+
 ## [1.10.093] - 2026-10-01 00:00
 
 ### Changed

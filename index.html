@@ -1793,7 +1793,6 @@
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
 </head>
 <body>
 
@@ -2041,135 +2040,94 @@ function isEmailAllowed(email){
   return !!email && ALLOWED_EMAILS.includes(String(email).trim().toLowerCase());
 }
 
-/* ===================== OUTLOOK (Microsoft Graph) ===================== */
-const OUTLOOK_CLIENT_ID = '553b6f2f-ee51-494a-8b3a-35aeab00c172';
-/* Usa a origem atual (sem o caminho) como redirect URI, pra funcionar em
-   qualquer domínio onde o app estiver rodando (domínio próprio, Vercel, etc.)
-   — todos precisam estar cadastrados como Redirect URI no Azure também. */
-const OUTLOOK_REDIRECT_URI = window.location.origin + '/';
-const OUTLOOK_SCOPES = ['Calendars.ReadWrite'];
-const msalInstance = (window.msal && OUTLOOK_CLIENT_ID)
-  ? new msal.PublicClientApplication({
-      auth: {
-        clientId: OUTLOOK_CLIENT_ID,
-        authority: 'https://login.microsoftonline.com/consumers',
-        redirectUri: OUTLOOK_REDIRECT_URI,
-      },
-      cache: { cacheLocation: 'localStorage' }
-    })
-  : null;
-let outlookAccount = null;
-let outlookMsalReady = msalInstance
-  ? msalInstance.initialize().then(() => {
-      const accounts = msalInstance.getAllAccounts();
-      if(accounts.length) outlookAccount = accounts[0];
-    }).catch(e => console.error('Erro ao iniciar MSAL', e))
-  : Promise.resolve();
-
+/* ===================== OUTLOOK (Microsoft Graph, via API server-side) =====================
+   O token de acesso do Outlook não fica mais no navegador: fica guardado no
+   Supabase, gerenciado pelas funções da Vercel em /api/outlook/*, que usam um
+   client secret pra renovar sozinhas (refresh token) sem depender de popup
+   nem do armazenamento local de cada domínio/navegador. */
+let outlookStatusCache = null;
+async function outlookApi(path, options){
+  if(!cloudSession) throw new Error('Sem sessão na nuvem.');
+  const resp = await fetch(path, {
+    ...options,
+    headers: {
+      ...(options && options.headers),
+      Authorization: `Bearer ${cloudSession.access_token}`,
+    },
+  });
+  const data = await resp.json().catch(() => ({}));
+  if(!resp.ok) throw Object.assign(new Error(data.error || 'Erro na API do Outlook'), { data, status: resp.status });
+  return data;
+}
 async function connectOutlook(){
-  if(!msalInstance) throw new Error('MSAL não carregado.');
-  await outlookMsalReady;
-  const result = await msalInstance.loginPopup({ scopes: OUTLOOK_SCOPES });
-  outlookAccount = result.account;
-  return outlookAccount;
+  const { url } = await outlookApi('/api/outlook/connect-url');
+  window.location.href = url;
 }
-function disconnectOutlook(){
-  if(!msalInstance || !outlookAccount) return;
-  const account = outlookAccount;
-  outlookAccount = null;
-  msalInstance.logoutPopup({ account }).catch(e => console.error(e));
-}
-async function getOutlookToken(){
-  if(!msalInstance || !outlookAccount) return null;
-  try{
-    const result = await msalInstance.acquireTokenSilent({ scopes: OUTLOOK_SCOPES, account: outlookAccount });
-    return result.accessToken;
-  }catch(e){
-    try{
-      const result = await msalInstance.acquireTokenPopup({ scopes: OUTLOOK_SCOPES, account: outlookAccount });
-      return result.accessToken;
-    }catch(e2){
-      console.error('Falha ao obter token do Outlook', e2);
-      return null;
-    }
-  }
-}
-function eventToGraphPayload(ev){
-  const cat = catById(ev.categoryId);
-  const tz = 'America/Sao_Paulo';
-  const payload = {
-    subject: ev.title || 'Sem título',
-    body: { contentType: 'text', content: ev.description || '' },
-    categories: cat ? [cat.name] : [],
-  };
-  if(ev.allDay || !ev.startTime){
-    payload.isAllDay = true;
-    payload.start = { dateTime: (ev.date || todayStr()) + 'T00:00:00', timeZone: tz };
-    payload.end = { dateTime: addDaysStr(ev.endDate || ev.date, 1) + 'T00:00:00', timeZone: tz };
-  } else {
-    payload.isAllDay = false;
-    payload.start = { dateTime: (ev.date || todayStr()) + 'T' + ev.startTime + ':00', timeZone: tz };
-    payload.end = { dateTime: (ev.endDate || ev.date || todayStr()) + 'T' + (ev.endTime || ev.startTime) + ':00', timeZone: tz };
-  }
-  return payload;
+async function disconnectOutlook(){
+  await outlookApi('/api/outlook/disconnect', { method: 'POST' });
+  outlookStatusCache = { connected: false };
 }
 async function syncEventToOutlook(ev){
-  if(!outlookAccount) return;
-  const token = await getOutlookToken();
-  if(!token) return;
-  const payload = eventToGraphPayload(ev);
+  if(!cloudSession) return;
+  if(!outlookStatusCache) await refreshOutlookStatus();
+  if(!outlookStatusCache || !outlookStatusCache.connected) return;
+  const cat = catById(ev.categoryId);
   try{
-    if(ev.outlookEventId){
-      const resp = await fetch(`https://graph.microsoft.com/v1.0/me/events/${ev.outlookEventId}`, {
-        method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if(resp.status === 404){
-        ev.outlookEventId = null;
-        await syncEventToOutlook(ev);
-      }
-    } else {
-      const resp = await fetch('https://graph.microsoft.com/v1.0/me/events', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await resp.json();
-      if(resp.ok && data.id){
-        ev.outlookEventId = data.id;
-        markDirty();
-      }
+    const result = await outlookApi('/api/outlook/sync-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'sync',
+        outlookEventId: ev.outlookEventId || null,
+        event: { ...ev, categoryName: cat ? cat.name : null },
+      }),
+    });
+    if(result.outlookEventId && result.outlookEventId !== ev.outlookEventId){
+      ev.outlookEventId = result.outlookEventId;
+      markDirty();
     }
   }catch(e){ console.error('Erro ao sincronizar com Outlook', e); }
 }
 async function deleteEventFromOutlook(ev){
-  if(!outlookAccount || !ev.outlookEventId) return;
-  const token = await getOutlookToken();
-  if(!token) return;
+  if(!cloudSession || !ev.outlookEventId) return;
+  if(!outlookStatusCache) await refreshOutlookStatus();
+  if(!outlookStatusCache || !outlookStatusCache.connected) return;
   try{
-    await fetch(`https://graph.microsoft.com/v1.0/me/events/${ev.outlookEventId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` }
+    await outlookApi('/api/outlook/sync-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', outlookEventId: ev.outlookEventId }),
     });
   }catch(e){ console.error('Erro ao excluir do Outlook', e); }
 }
-function renderOutlookStatus(){
+async function refreshOutlookStatus(){
+  if(!cloudSession){ outlookStatusCache = { connected: false }; return outlookStatusCache; }
+  try{
+    outlookStatusCache = await outlookApi('/api/outlook/status');
+  }catch(e){
+    console.error(e);
+    outlookStatusCache = { connected: false };
+  }
+  return outlookStatusCache;
+}
+async function renderOutlookStatus(){
   const row = document.getElementById('outlookStatusRow');
   if(!row) return;
   const hint = document.getElementById('outlookHint');
   if(hint){ hint.textContent = ''; }
-  if(!msalInstance){
-    row.innerHTML = `<span style="font-size:13px; color:var(--ink-faint);">Integração indisponível (biblioteca não carregou).</span>`;
+  if(!cloudSession){
+    row.innerHTML = `<span style="font-size:13px; color:var(--ink-faint);">Disponível apenas com a conta na nuvem conectada.</span>`;
     return;
   }
-  if(outlookAccount){
+  row.innerHTML = `<span style="font-size:13px; color:var(--ink-faint);">Verificando...</span>`;
+  const status = await refreshOutlookStatus();
+  if(status.connected){
     row.innerHTML = `
-      <span style="font-size:13px; color:var(--primary-dark); font-weight:600;">Conectado como ${escapeHtml(outlookAccount.username||'')}</span>
+      <span style="font-size:13px; color:var(--primary-dark); font-weight:600;">Conectado${status.account ? ' como ' + escapeHtml(status.account) : ''}</span>
       <button class="btn ghost small" id="outlookDisconnectBtn">Desconectar</button>
     `;
-    document.getElementById('outlookDisconnectBtn').onclick = () => {
-      disconnectOutlook();
+    document.getElementById('outlookDisconnectBtn').onclick = async () => {
+      try{ await disconnectOutlook(); }catch(e){ console.error(e); }
       renderOutlookStatus();
     };
   } else {
@@ -2179,7 +2137,6 @@ function renderOutlookStatus(){
       btn.disabled = true; btn.textContent = 'Conectando...';
       try{
         await connectOutlook();
-        renderOutlookStatus();
       }catch(e){
         console.error(e);
         const h = document.getElementById('outlookHint');
@@ -2189,6 +2146,21 @@ function renderOutlookStatus(){
     };
   }
 }
+function handleOutlookRedirectFeedback(){
+  const params = new URLSearchParams(window.location.search);
+  const outlookParam = params.get('outlook');
+  if(!outlookParam) return;
+  params.delete('outlook');
+  params.delete('reason');
+  const newQuery = params.toString();
+  window.history.replaceState({}, '', window.location.pathname + (newQuery ? '?' + newQuery : ''));
+  if(outlookParam === 'connected'){
+    pendingOutlookToast = 'Outlook conectado!';
+  } else if(outlookParam === 'error'){
+    pendingOutlookToast = 'Não foi possível conectar ao Outlook. Tente de novo.';
+  }
+}
+let pendingOutlookToast = null;
 let activeTaskId = null;
 let creatingNewTask = false;
 let tagsPopoverOpen = false;
@@ -5246,7 +5218,7 @@ function hideNoteComposerOverlay(){
 }
 
 /* ===================== CALENDÁRIO ===================== */
-const APP_VERSION = '1.10.093';
+const APP_VERSION = '1.10.094';
 const WEEKDAY_LABELS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const WEEKDAY_FULL_LABELS = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -7374,8 +7346,22 @@ async function startCloudSession(){
   if(state.calendarViewDefault) calendarView = state.calendarViewDefault;
   loadUiSession();
   closeLoginGate();
+  handleOutlookRedirectFeedback();
   render();
   updateFileStatus();
+  if(pendingOutlookToast){ showToast(pendingOutlookToast); pendingOutlookToast = null; }
+}
+
+function showToast(message){
+  const el = document.createElement('div');
+  el.textContent = message;
+  el.style.cssText = 'position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--surface); padding:10px 18px; border-radius:10px; font-size:13px; font-weight:500; box-shadow:var(--shadow-md); z-index:9999; opacity:0; transition:opacity .2s;';
+  document.body.appendChild(el);
+  requestAnimationFrame(() => { el.style.opacity = '1'; });
+  setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
 }
 
 function dounoIconSvg(color){
