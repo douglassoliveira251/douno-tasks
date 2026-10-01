@@ -1,3 +1,13 @@
+## [1.10.093] - 2026-10-01 00:00
+
+### Changed
+
+#### Integrações
+
+- Redirect URI do login com o Outlook deixou de ser fixo (`tasks.douno.com.br`) e passou a usar a origem atual da página — permite o login funcionar tanto no domínio próprio quanto no espelho publicado na Vercel, desde que cada endereço esteja cadastrado como Redirect URI no Azure.
+
+
+
 ## [1.10.092] - 2026-09-30 00:00
 
 ### Changed
