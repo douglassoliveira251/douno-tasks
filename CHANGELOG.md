@@ -1,3 +1,13 @@
+## [1.10.098] - 2026-10-01 00:00
+
+### Changed
+
+#### Tarefas
+
+- Anexos: o ícone de anexar ficava empurrado pro canto direito (`justify-content:space-between`), longe do rótulo "Anexos" — deixava difícil de notar. Agora fica logo ao lado do texto, os dois à esquerda.
+
+
+
 ## [1.10.097] - 2026-10-01 00:00
 
 ### Changed
