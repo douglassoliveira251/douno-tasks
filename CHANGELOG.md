@@ -1,3 +1,13 @@
+## [1.10.096] - 2026-10-01 00:00
+
+### Fixed
+
+#### Integrações → Outlook
+
+- "Conectar Outlook" falhava na hora (antes de abrir a tela da Microsoft) se a aba estivesse aberta há mais de ~1h: o token usado pra chamar nossa própria API vinha de uma variável capturada só no login, que nunca era atualizada — enquanto isso, o SDK do Supabase renova o token sozinho em segundo plano. Agora busca a sessão atual a cada chamada, em vez do valor antigo.
+
+
+
 ## [1.10.095] - 2026-10-01 00:00
 
 ### Added
