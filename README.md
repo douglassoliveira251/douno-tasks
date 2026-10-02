@@ -50,9 +50,24 @@ Na primeira execução, o sistema vai pedir para você criar ou selecionar um ar
 
 ```
 ├── index.html       # aplicação completa (HTML + CSS + JS em um único arquivo)
+├── api/              # funções serverless da Vercel (integração com o Outlook)
+├── tests/            # testes automatizados (Playwright) — não afeta o deploy
 ├── CHANGELOG.md      # histórico de versões
 └── README.md         # este arquivo
 ```
+
+## ✅ Testes
+
+Testes de ponta a ponta com [Playwright](https://playwright.dev), cobrindo os fluxos mais sensíveis a regressão (recorrência de tarefas, editor de notas, sincronização com a nuvem). Rodam num `tests/` isolado, com seu próprio `package.json` — não interferem no deploy do `index.html`, que continua sem build step.
+
+```bash
+cd tests
+npm install
+npx playwright install chromium   # só na primeira vez
+npm test
+```
+
+Também rodam automaticamente a cada push/PR na branch `main` (veja `.github/workflows/tests.yml`).
 
 ## 🔢 Versionamento
 
