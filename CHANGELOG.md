@@ -1,3 +1,13 @@
+## [1.10.099] - 2026-10-02 00:00
+
+### Fixed
+
+#### Nuvem
+
+- Corrige perda de edições ao entrar numa tela e começar a editar rápido demais: ao trocar de tela, o app busca a versão mais recente da nuvem antes de deixar editar (pra não sobrescrever o que foi mudado em outro dispositivo) — mas essa busca é assíncrona, e se a edição começasse antes dela terminar, quando a busca concluía ela sobrescrevia o `state` inteiro, apagando a edição em andamento. Agora, se o usuário começou a editar algo enquanto a busca ainda estava em andamento, o resultado da busca é descartado em vez de aplicado.
+
+
+
 ## [1.10.098] - 2026-10-01 00:00
 
 ### Changed
